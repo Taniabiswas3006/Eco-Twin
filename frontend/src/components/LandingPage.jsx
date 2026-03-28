@@ -34,7 +34,7 @@ export default function LandingPage() {
         
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-600">
            <a href="#features" className="hover:text-neutral-900 transition-colors">Features</a>
-           <a href="#how" className="hover:text-neutral-900 transition-colors flex items-center gap-1">How It Works <ChevronRight size={14} className="rotate-90"/></a>
+           <Link to="/how-it-works" className="hover:text-neutral-900 transition-colors flex items-center gap-1">How It Works <ChevronRight size={14}/></Link>
            <Link to="/blog" className="hover:text-neutral-900 transition-colors">Blog</Link>
            <Link to="/signup">
              <button className="bg-[#5c9853] hover:bg-[#4b7a44] text-white px-6 py-2.5 rounded-full font-medium transition-all active:scale-95 shadow-md">

@@ -1,12 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from dotenv import load_dotenv
 import pickle
 import pandas as pd
 import numpy as np
 import os
 
+load_dotenv()
+
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=os.environ.get("CORS_ORIGIN", "http://localhost:5173"), supports_credentials=True)
 
 # Load the models
 try:

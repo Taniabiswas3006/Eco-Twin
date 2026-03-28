@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage';
 import AuthPage from './components/AuthPage';
 import DigitalTwin from './components/DigitalTwin';
 import BlogPage from './components/BlogPage';
+import HowItWorks from './components/HowItWorks';
 
 function App() {
   useEffect(() => {
@@ -50,6 +51,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/*" element={
             <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-center p-6 relative">
               <Routes>
