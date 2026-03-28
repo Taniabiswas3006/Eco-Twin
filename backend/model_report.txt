@@ -1,0 +1,73 @@
+﻿.\venv\Scripts\python.exe : C:\Users\TANIA\Deskto
+p\digital_twin\backend\venv\Lib\site-packages\skl
+earn\utils\validation.py:2739: UserWarning: X 
+does not have valid feature names, but 
+LinearRegression was fitted with feature names
+At line:1 char:1
++ .\venv\Scripts\python.exe inspect_models.py 
+2>&1 | Out-File -FilePath ...
++ 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\ 
+   Users\TANIA\...h feature names:String) [], R  
+  emoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  warnings.warn(
+C:\Users\TANIA\Desktop\digital_twin\backend\venv\
+Lib\site-packages\sklearn\utils\validation.py:273
+9: UserWarning: X does not have valid feature 
+names, but LinearRegression was fitted with 
+feature names
+  warnings.warn(
+C:\Users\TANIA\Desktop\digital_twin\backend\venv\
+Lib\site-packages\sklearn\utils\validation.py:273
+9: UserWarning: X does not have valid feature 
+names, but LinearRegression was fitted with 
+feature names
+  warnings.warn(
+C:\Users\TANIA\Desktop\digital_twin\backend\venv\
+Lib\site-packages\sklearn\utils\validation.py:273
+9: UserWarning: X does not have valid feature 
+names, but LinearRegression was fitted with 
+feature names
+  warnings.warn(
+C:\Users\TANIA\Desktop\digital_twin\backend\venv\
+Lib\site-packages\sklearn\utils\validation.py:273
+9: UserWarning: X does not have valid feature 
+names, but DecisionTreeClassifier was fitted 
+with feature names
+  warnings.warn(
+C:\Users\TANIA\Desktop\digital_twin\backend\venv\
+Lib\site-packages\sklearn\utils\validation.py:273
+9: UserWarning: X does not have valid feature 
+names, but DecisionTreeClassifier was fitted 
+with feature names
+  warnings.warn(
+
+=== carbon.pkl ===
+Type: LinearRegression
+N features expected: 5
+Coefficients: [1.20000000e+01 1.33226763e-15 6.00000000e+00 3.00000000e+00
+ 4.44089210e-16]
+Intercept: -3.552713678800501e-14
+Feature names: ['travel' 'electricity' 'meat' 'shopping' 'ac']
+Predict(high impact): [69.]
+Predict(low impact):  [18.]
+
+=== energy.pkl ===
+Type: LinearRegression
+N features expected: 5
+Coefficients: [-6.16147753e-15  4.00000000e+00 -1.11022302e-15  1.08246745e-15
+  7.00000000e+00]
+Intercept: 0.0
+Feature names: ['travel' 'electricity' 'meat' 'shopping' 'ac']
+Predict(high impact): [47.]
+Predict(low impact):  [8.]
+
+=== waste.pkl ===
+Type: DecisionTreeClassifier
+N features expected: 5
+Feature names: ['travel' 'electricity' 'meat' 'shopping' 'ac']
+Predict(high impact): [1]
+Predict(low impact):  [0]

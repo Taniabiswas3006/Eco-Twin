@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: #f4fcf4;
+  overflow: visible;
+}
+
+#root {
+  min-height: 100%;
+}
+
+@theme {
+  --color-eco-50: #f4f9f4;
+  --color-eco-100: #e3f0e5;
+  --color-eco-200: #c7e0cb;
+  --color-eco-300: #9bca1b;
+  --color-eco-400: #75ab6b;
+  --color-eco-500: #558d4d;
+  --color-eco-600: #41703a;
+  --color-eco-700: #345930;
+  --color-eco-800: #2b4728;
+  --color-eco-900: #243a22;
+  --color-eco-950: #111f10;
+
+  --color-neutral-50: #f8f9fa;
+  --color-neutral-100: #f1f3f5;
+  --color-neutral-200: #e9ecef;
+  --color-neutral-800: #343a40;
+  --color-neutral-900: #212529;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --shadow-apple: 0 4px 24px rgba(0,0,0,0.06);
+}
+@layer base {
+  body {
+    @apply bg-neutral-50 text-neutral-800 font-sans antialiased transition-colors duration-500 min-h-screen overflow-x-hidden;
+  }
+  
+  .dark {
+    color-scheme: dark;
+  }
+
+  .dark body {
+    @apply bg-neutral-950 text-neutral-100;
+  }
+
+  /* Glowing green text effect for specialized dark mode */
+  .dark h1, .dark h2, .dark h3, .dark b, .dark .font-bold, .dark .font-semibold {
+    text-shadow: 0 0 15px rgba(155, 202, 27, 0.25), 0 0 2px rgba(155, 202, 27, 0.4);
+    @apply text-white!;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-neutral-100/50 shadow-apple rounded-2xl transition-all duration-300;
+  }
+  
+  .dark .glass-card {
+    @apply bg-neutral-900/60 border-white/10 shadow-none;
+  }
+
+  /* Universal dark mode overrides for basic utility components */
+  .dark .bg-white,
+  .dark .bg-neutral-50,
+  .dark .bg-neutral-50\/20,
+  .dark .bg-neutral-50\/30 {
+    @apply bg-neutral-950! text-neutral-100!;
+  }
+
+  .dark .border-neutral-100,
+  .dark .border-neutral-50,
+  .dark .border-white\/20,
+  .dark .border-white\/10 {
+    @apply border-neutral-800!;
+  }
+
+  .dark .text-neutral-900 {
+    @apply text-white!;
+  }
+
+  .dark .text-neutral-500,
+  .dark .text-neutral-400 {
+    @apply text-neutral-400!;
+  }
+}
+
+/* Custom range slider */
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  accent-color: var(--color-eco-500);
+  @apply w-full h-2 bg-neutral-200 rounded-lg outline-none cursor-pointer;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  @apply w-6 h-6 rounded-full bg-eco-500! cursor-pointer shadow-md border-2 border-white transition-transform hover:scale-110;
+}
+
+input[type=range]::-moz-range-thumb {
+  @apply w-6 h-6 rounded-full bg-eco-500! cursor-pointer shadow-md border-2 border-white transition-transform hover:scale-110;
+}
