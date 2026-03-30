@@ -45,6 +45,10 @@ def prepare_features(data):
     
     return np.array([[travel_val, electricity_val, food_val, shopping_val, ac_val]])
 
+@app.route('/', methods=['GET', 'HEAD'])
+def index():
+    return jsonify({"status": "active", "message": "EcoTwin Backend is running perfectly!"}), 200
+
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
