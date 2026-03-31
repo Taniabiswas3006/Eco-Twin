@@ -16,7 +16,7 @@ export default function Settings() {
       
       const { username } = JSON.parse(storedUser);
       try {
-        const resp = await fetch(`http://localhost:5000/get-settings?username=${username}`);
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-settings?username=${username}`);
         if (resp.ok) {
           const settings = await resp.json();
           if (settings.theme) {
@@ -60,7 +60,7 @@ export default function Settings() {
 
     const { username } = JSON.parse(storedUser);
     try {
-      const resp = await fetch('http://localhost:5000/update-settings', {
+      const resp = await fetch(`${import.meta.env.VITE_API_URL}/update-settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

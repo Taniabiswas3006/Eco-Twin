@@ -14,7 +14,7 @@ function App() {
       if (storedUser) {
         try {
           const { username } = JSON.parse(storedUser);
-          const resp = await fetch(`http://localhost:5000/get-settings?username=${username}`);
+          const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-settings?username=${username}`);
           if (resp.ok) {
             const settings = await resp.json();
             const isDark = settings.theme === 'dark';

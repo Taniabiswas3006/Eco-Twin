@@ -9,7 +9,8 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, origins=os.environ.get("CORS_ORIGIN", "http://localhost:5173"), supports_credentials=True)
+origins_str = os.environ.get("CORS_ORIGIN", "")
+CORS(app, origins=[o.strip() for o in origins_str.split(',') if o.strip()], supports_credentials=True)
 
 # Load the models
 try:

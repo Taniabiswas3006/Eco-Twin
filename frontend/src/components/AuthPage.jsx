@@ -17,7 +17,7 @@ export default function AuthPage({ mode = 'login' }) {
     setIsLoading(true);
     setError('');
 
-    const url = isLogin ? 'http://localhost:5000/login' : 'http://localhost:5000/signup';
+    const url = isLogin ? `${import.meta.env.VITE_API_URL}/login` : `${import.meta.env.VITE_API_URL}/signup`;
     
     try {
       const res = await fetch(url, {
