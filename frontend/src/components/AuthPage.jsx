@@ -85,13 +85,20 @@ export default function AuthPage({ mode = 'login' }) {
           </p>
         </div>
 
-        {error && (
-          <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100">
-            {error}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-300">
+            <div className="w-12 h-12 border-4 border-eco-100 border-t-eco-600 rounded-full animate-spin mb-4" />
+            <p className="text-neutral-500 font-medium text-sm animate-pulse">Syncing with EcoTwin...</p>
           </div>
-        )}
+        ) : (
+          <>
+            {error && (
+              <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100">
+                {error}
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {!isLogin && (
             <>
               <div>
@@ -219,6 +226,8 @@ export default function AuthPage({ mode = 'login' }) {
             {isLogin ? 'Sign up' : 'Log in'}
           </Link>
         </div>
+        </>
+        )}
       </motion.div>
     </div>
   );
