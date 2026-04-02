@@ -53,6 +53,20 @@ export default function DigitalTwin() {
       });
       
       const result = await response.json();
+      
+      // Safety: Ensure exactly 4 insights for UI balance
+      if (result.insights && result.insights.length < 4) {
+        const fallbacks = [
+          "Regular maintenance of appliances can improve energy efficiency by up to 15%.",
+          "Consider using LED bulbs to reduce lighting-related electricity costs significantly.",
+          "Choosing local seasonal produce can further lower your carbon footprint metrics.",
+          "Composting organic waste can reduce your contribution to landfills nearly by half."
+        ];
+        while (result.insights.length < 4) {
+          result.insights.push(fallbacks[result.insights.length]);
+        }
+      }
+      
       setPrediction(result);
       if (user && user.username) {
         localStorage.setItem(`eco_twin_prev_${user.username}`, JSON.stringify({ data, prediction: result }));
