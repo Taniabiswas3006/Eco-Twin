@@ -12,8 +12,27 @@ export default function AuthPage({ mode = 'login' }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const getPasswordStrength = (pass) => {
+    if (!pass) return 0;
+    let strength = 0;
+    if (pass.length >= 5) strength += 1;
+    if (pass.length >= 8) strength += 1;
+    if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) strength += 1;
+    if (/[0-9]/.test(pass) && /[^A-Za-z0-9]/.test(pass)) strength += 1;
+    return Math.max(1, Math.min(4, strength));
+  };
+  const pwStrength = getPasswordStrength(formData.password);
+  const strengthColors = ['', 'bg-red-400', 'bg-orange-400', 'bg-eco-400', 'bg-eco-600'];
+  const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!isLogin && formData.phone && formData.phone.length !== 10) {
+      setError('Please enter exactly 10 digits for the phone number.');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
@@ -44,20 +63,19 @@ export default function AuthPage({ mode = 'login' }) {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto relative mt-16">
-      <button 
-        onClick={() => navigate(-1)}
-        className="absolute -top-12 left-0 flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors font-medium text-sm bg-white/50 px-3 py-1.5 rounded-full border border-neutral-200 shadow-sm backdrop-blur-sm"
-      >
-        <ArrowLeft size={16} /> Back
-      </button>
-
+    <div className="w-full max-w-md mx-auto mt-16">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="glass-card p-10 flex flex-col"
+        className="glass-card p-6 sm:p-10 pt-16 sm:pt-16 flex flex-col relative"
       >
+        <button 
+          onClick={() => navigate(-1)}
+          className="absolute top-4 left-4 flex items-center gap-2 text-neutral-400 hover:text-neutral-800 transition-colors text-sm font-medium bg-neutral-100/50 hover:bg-neutral-200 px-3 py-1.5 rounded-full"
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold tracking-tight mb-2">
             {isLogin ? 'Welcome Back' : 'Join EcoTwin'}
@@ -103,9 +121,12 @@ export default function AuthPage({ mode = 'login' }) {
                     type="tel" 
                     required={!isLogin}
                     value={formData.phone}
-                    onChange={e => setFormData({...formData, phone: e.target.value})}
+                    onChange={e => {
+                      const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setFormData({...formData, phone: digits});
+                    }}
                     className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-eco-500/50 focus:border-eco-500 transition-all placeholder:text-neutral-400"
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="10-digit number"
                   />
                 </div>
               </div>
@@ -160,6 +181,18 @@ export default function AuthPage({ mode = 'login' }) {
                 placeholder="••••••••"
               />
             </div>
+            {!isLogin && formData.password && (
+              <div className="mt-3 px-1">
+                <div className="flex gap-1.5 mb-1.5">
+                  {[1, 2, 3, 4].map(idx => (
+                    <div key={idx} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${pwStrength >= idx ? strengthColors[pwStrength] : 'bg-neutral-200'}`} />
+                  ))}
+                </div>
+                <div className={`text-xs text-right font-medium transition-colors ${pwStrength <= 2 ? 'text-orange-500' : 'text-eco-600'}`}>
+                  {strengthLabels[pwStrength]}
+                </div>
+              </div>
+            )}
           </div>
 
           <button 

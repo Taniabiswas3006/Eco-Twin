@@ -15,13 +15,29 @@ export default function DigitalTwin() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState(null);
+  const [hasPrevious, setHasPrevious] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      if (localStorage.getItem(`eco_twin_prev_${parsedUser.username}`)) {
+        setHasPrevious(true);
+      }
     }
   }, []);
+
+  const handleLoadPrevious = () => {
+    if (user && user.username) {
+      const prev = localStorage.getItem(`eco_twin_prev_${user.username}`);
+      if (prev) {
+        const { data, prediction } = JSON.parse(prev);
+        setUserData(data);
+        setPrediction(prediction);
+      }
+    }
+  };
 
   const handleCalculate = async (data) => {
     setIsLoading(true);
@@ -38,6 +54,10 @@ export default function DigitalTwin() {
       
       const result = await response.json();
       setPrediction(result);
+      if (user && user.username) {
+        localStorage.setItem(`eco_twin_prev_${user.username}`, JSON.stringify({ data, prediction: result }));
+        setHasPrevious(true);
+      }
     } catch (error) {
       console.error("Error predicting:", error);
       setPrediction({
@@ -69,13 +89,6 @@ export default function DigitalTwin() {
   if (!showSidebar) {
     return (
       <div className="w-full relative mt-16 animate-in fade-in duration-700">
-        <button 
-          onClick={handleLogout}
-          className="absolute -top-12 left-0 z-50 flex items-center gap-2 text-neutral-500 hover:text-neutral-900 transition-colors font-medium text-sm bg-white/50 px-3 py-1.5 rounded-full border border-neutral-200 shadow-sm backdrop-blur-sm"
-        >
-          <ArrowLeft size={16} /> Log Out
-        </button>
-
         <AnimatePresence mode="wait">
           <motion.div
             key="form"
@@ -84,7 +97,13 @@ export default function DigitalTwin() {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
           >
-            <InputForm onComplete={handleCalculate} isLoading={isLoading} />
+            <InputForm 
+              onComplete={handleCalculate} 
+              isLoading={isLoading} 
+              hasPrevious={hasPrevious} 
+              onLoadPrevious={handleLoadPrevious} 
+              onLogout={handleLogout}
+            />
           </motion.div>
         </AnimatePresence>
       </div>

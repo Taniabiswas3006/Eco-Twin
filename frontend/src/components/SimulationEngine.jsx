@@ -66,8 +66,16 @@ export default function SimulationEngine({ userData, currentScore }) {
 
   // Extract state logic to sync with labels and badges
   let avatarState = 'thriving';
-  if (scoreToUse <= 40 || (yearsDiff >= 10 && scoreToUse < 80)) avatarState = 'dying';
-  else if (scoreToUse < 80 || (yearsDiff > 5 && scoreToUse < 90)) avatarState = 'struggling';
+  
+  // Custom sandbox logic strictly overrides default thriving:
+  if (simulatedData.electricity > 5 || simulatedData.ac > 2 || simulatedData.shopping > 1) {
+    avatarState = 'struggling';
+  }
+
+  // Extreme cases still cause dying state
+  if (scoreToUse <= 40 || (yearsDiff >= 10 && avatarState === 'struggling')) {
+    avatarState = 'dying';
+  }
 
   // Feature 2: The Eco-Avatar (Tamagotchi concept)
   const renderAvatar = () => {
@@ -158,24 +166,50 @@ export default function SimulationEngine({ userData, currentScore }) {
         </div>
 
         {/* Feature 6: Eco-Wallet Widget */}
-        <div className="mt-6 bg-green-50 rounded-2xl p-5 border border-green-200/60 relative overflow-hidden">
-          <div className="absolute -right-6 -bottom-6 opacity-[0.05]"><Wallet size={120}/></div>
-          <div className="relative z-10 flex items-center gap-2 mb-3">
-            <div className="bg-green-100 p-1.5 rounded-md text-green-600"><Wallet size={16}/></div>
-            <p className="text-[10px] font-bold text-green-700 uppercase tracking-widest">Eco-Wallet Impact</p>
+        <div className="mt-6 bg-green-50 rounded-2xl p-5 border border-green-200/60 relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+          <div className="absolute -right-6 -bottom-6 opacity-[0.05] pointer-events-none transition-transform group-hover:scale-110"><Wallet size={140}/></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-green-100 p-2 rounded-lg text-green-600 shadow-sm"><Wallet size={18}/></div>
+              <p className="text-xs font-bold text-green-700 uppercase tracking-widest leading-none">Eco-Wallet</p>
+            </div>
+            <p className="text-[12px] text-green-800/70 leading-relaxed font-medium">Monthly savings from these habit adjustments:</p>
           </div>
-          <p className="relative z-10 text-[11px] text-green-800/80 mb-2 font-medium">Estimated monthly financial change resulting from these habit adjustments:</p>
-          <div className="relative z-10 flex items-baseline gap-1 mt-1">
-            <span className={`text-4xl font-bold tracking-tighter ${projectedSavings >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {projectedSavings > 0 ? '+' : projectedSavings < 0 ? '-' : ''}₹{Math.abs(projectedSavings).toLocaleString()}
-            </span>
-            <span className={`text-[10px] font-bold uppercase tracking-widest ${projectedSavings >= 0 ? 'text-green-600/70' : 'text-red-500/70'}`}>/ mo</span>
+
+          <div className="relative z-10 mt-2">
+            <div className="flex items-start gap-1">
+              <span className={`text-xs font-bold mt-1 ${projectedSavings >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                {projectedSavings > 0 ? '+' : projectedSavings < 0 ? '-' : ''}
+              </span>
+              <div className="flex flex-col">
+                <div className="flex items-baseline gap-1 leading-none">
+                  <span className={`text-3xl font-bold tracking-tighter ${projectedSavings >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                    ₹{Math.abs(projectedSavings).toLocaleString()}
+                  </span>
+                  <span className={`text-[9px] font-bold uppercase tracking-tight ${projectedSavings >= 0 ? 'text-green-600/60' : 'text-red-500/60'}`}>
+                    / month
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-2 relative z-10">
+              {projectedSavings < 0 ? (
+                <div className="inline-flex items-center px-2 py-0.5 bg-red-100/50 rounded-md border border-red-200/50">
+                   <span className="text-[9px] font-bold text-red-500 uppercase tracking-wide">Increased Cost</span>
+                </div>
+              ) : projectedSavings > 0 ? (
+                <div className="inline-flex items-center px-2 py-0.5 bg-green-100/50 rounded-md border border-green-200/50">
+                   <span className="text-[9px] font-bold text-green-600 uppercase tracking-wide">Savings Achieved</span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center px-2 py-0.5 bg-neutral-100 rounded-md">
+                   <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-wide">No Change</span>
+                </div>
+              )}
+            </div>
           </div>
-          {projectedSavings < 0 ? (
-            <p className="relative z-10 text-[10px] font-bold text-red-500/80 mt-2 uppercase tracking-wide">These habits are costing you more!</p>
-          ) : projectedSavings > 0 ? (
-            <p className="relative z-10 text-[10px] font-bold text-green-600 mt-2 uppercase tracking-wide">Incredible Savings! 🎉</p>
-          ) : null}
         </div>
       </div>
 

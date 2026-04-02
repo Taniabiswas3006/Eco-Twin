@@ -8,6 +8,11 @@ import HowItWorks from './components/HowItWorks';
 
 function App() {
   useEffect(() => {
+    // Feature: Auto-redirect to landing on refresh
+    if (window.location.pathname !== '/' && !window.location.pathname.includes('/app')) {
+      window.location.replace('/');
+    }
+
     // Global theme initialization
     const initializeTheme = async () => {
       const storedUser = localStorage.getItem('user');

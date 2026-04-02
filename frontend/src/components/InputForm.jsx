@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Leaf, Zap, Utensils, ShoppingBag, Car, Train, Bike, Snowflake } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Leaf, Zap, Utensils, ShoppingBag, Car, Train, Bike, Snowflake, ChevronDown } from 'lucide-react';
 
 const steps = [
   { id: 'travel', title: 'How do you usually get around?' },
@@ -8,9 +8,17 @@ const steps = [
   { id: 'ac', title: 'AC & heavy appliance usage per day' },
   { id: 'food', title: 'What best describes your diet?' },
   { id: 'shopping', title: 'How often do you shop for non-essentials?' },
+  { id: 'region', title: 'Where do you currently live?' },
 ];
 
-export default function InputForm({ onComplete, isLoading }) {
+const regions = [
+  "India", "United States", "United Kingdom", "Canada", "Germany", "France", "Japan", "Australia", "Brazil",
+  "China", "South Korea", "Italy", "Spain", "Russia", "Mexico", "Indonesia", "Netherlands", "Saudi Arabia", "Turkey",
+  "Switzerland", "Sweden", "Norway", "Denmark", "Finland", "Argentina", "Chile", "South Africa", "Nigeria", "Egypt",
+  "Singapore", "Malaysia", "Thailand", "Vietnam", "Philippines", "Israel", "U.A.E.", "Australia", "New Zealand"
+].sort();
+
+export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPrevious, onLogout }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     travel: 'public',
@@ -18,7 +26,9 @@ export default function InputForm({ onComplete, isLoading }) {
     ac: 3,
     food: 'veg',
     shopping: 2,
+    region: 'India',
   });
+  const [showRegionDrop, setShowRegionDrop] = useState(false);
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
@@ -53,7 +63,14 @@ export default function InputForm({ onComplete, isLoading }) {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto glass-card p-10 mt-10">
+    <div className="w-full max-w-2xl mx-auto glass-card p-4 sm:p-10 pt-16 sm:pt-16 mt-10 relative">
+      <button 
+        onClick={onLogout}
+        className="absolute top-4 left-4 flex items-center gap-2 text-neutral-400 hover:text-neutral-800 transition-colors text-sm font-medium bg-neutral-100/50 hover:bg-neutral-200 px-3 py-1.5 rounded-full"
+      >
+        <ArrowLeft size={16} /> Log Out
+      </button>
+
       <div className="flex justify-between items-center mb-8 text-neutral-400 text-sm font-medium">
         <span>Step {currentStep + 1} of {steps.length}</span>
         <div className="flex gap-1">
@@ -158,11 +175,64 @@ export default function InputForm({ onComplete, isLoading }) {
                 </div>
               </div>
             )}
+
+            {currentStep === 5 && (
+              <div className="py-2">
+                <div className="flex flex-col gap-3 max-w-sm mx-auto">
+                  <p className="text-neutral-500 text-sm font-medium ml-1">Current Residence</p>
+                  
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowRegionDrop(!showRegionDrop)}
+                      className="w-full flex justify-between items-center px-5 py-3.5 bg-neutral-50/50 border border-neutral-200 rounded-2xl hover:border-eco-300 transition-all text-left group shadow-sm"
+                    >
+                      <span className="font-semibold text-neutral-800">{formData.region}</span>
+                      <ChevronDown size={18} className={`text-neutral-400 transition-transform ${showRegionDrop ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {showRegionDrop && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 5, scale: 1 }}
+                          exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                          className="absolute z-[110] left-0 right-0 top-full bg-white border border-neutral-100 shadow-2xl rounded-2xl max-h-[150px] overflow-y-auto scrollbar-hide py-2 mt-1"
+                        >
+                          {regions.map((region, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                setFormData({ ...formData, region });
+                                setShowRegionDrop(false);
+                              }}
+                              className={`w-full text-left px-5 py-2.5 hover:bg-eco-50 transition-colors text-sm font-medium
+                                ${formData.region === region ? 'bg-eco-50/50 text-eco-700' : 'text-neutral-600'}`}
+                            >
+                              {region}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                  
+                  <p className="text-[11px] text-neutral-400 mt-2 px-1 italic">We use this to estimate local carbon intensity of your electrical grid.</p>
+                </div>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
 
       <div className="mt-8 flex justify-end gap-3">
+        {hasPrevious && (
+          <button
+            onClick={onLoadPrevious}
+            className="mr-auto px-6 py-3 rounded-full font-medium flex items-center gap-2 text-eco-600 bg-eco-50 hover:bg-eco-100 transition-all active:scale-95"
+          >
+            Load Previous Data
+          </button>
+        )}
         {currentStep > 0 && (
           <button
             onClick={prevStep}
