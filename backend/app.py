@@ -273,11 +273,17 @@ def init_db():
             name TEXT DEFAULT '',
             phone TEXT DEFAULT '',
             gender TEXT DEFAULT '',
-            settings TEXT DEFAULT '{}'
+            settings TEXT DEFAULT '{}',
+            bounties TEXT DEFAULT '[]',
+            xp INTEGER DEFAULT 0,
+            level INTEGER DEFAULT 1
         )''')
         # Handle existing table
         try:
             c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS settings TEXT DEFAULT '{}'")
+            c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS bounties TEXT DEFAULT '[]'")
+            c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0")
+            c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1")
         except:
             pass
     else:
@@ -289,13 +295,24 @@ def init_db():
             name TEXT DEFAULT '',
             phone TEXT DEFAULT '',
             gender TEXT DEFAULT '',
-            settings TEXT DEFAULT '{}'
+            settings TEXT DEFAULT '{}',
+            bounties TEXT DEFAULT '[]',
+            xp INTEGER DEFAULT 0,
+            level INTEGER DEFAULT 1
         )''')
         # SQLite column check
         try:
             c.execute("ALTER TABLE users ADD COLUMN settings TEXT DEFAULT '{}'")
-        except:
-            pass
+        except: pass
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN bounties TEXT DEFAULT '[]'")
+        except: pass
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN xp INTEGER DEFAULT 0")
+        except: pass
+        try:
+            c.execute("ALTER TABLE users ADD COLUMN level INTEGER DEFAULT 1")
+        except: pass
     
     conn.commit()
     conn.close()
@@ -440,6 +457,65 @@ def update_settings():
         return jsonify({"message": "Settings updated successfully"}), 200
     except Exception as e:
         print(f"Update settings error: {e}")
+        return jsonify({"error": "Database error"}), 500
+
+@app.route('/get-bounties', methods=['GET'])
+def get_bounties():
+    username = request.args.get('username')
+    if not username:
+        return jsonify({"error": "Username required"}), 400
+        
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
+        c.execute(f"SELECT bounties, xp, level FROM users WHERE username={placeholder}", (username,))
+        row = c.fetchone()
+        conn.close()
+        
+        if row:
+            # Handle both SQLite (Row) and PostgreSQL (Tuple)
+            if hasattr(row, 'keys'): # SQLite
+                return jsonify({
+                    "bounties": json.loads(row['bounties'] or '[]'),
+                    "xp": row['xp'] or 0,
+                    "level": row['level'] or 1
+                }), 200
+            else: # PostgreSQL/Tuple
+                return jsonify({
+                    "bounties": json.loads(row[0] or '[]'),
+                    "xp": row[1] or 0,
+                    "level": row[2] or 1
+                }), 200
+        return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        print(f"Get bounties error: {e}")
+        return jsonify({"error": "Database error"}), 500
+
+@app.route('/update-bounties', methods=['POST'])
+def update_bounties():
+    data = request.json
+    if not data or 'username' not in data:
+        return jsonify({"error": "Username required"}), 400
+        
+    username = data['username']
+    bounties_json = json.dumps(data.get('bounties', []))
+    xp = data.get('xp', 0)
+    level = data.get('level', 1)
+    
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
+        c.execute(
+            f"UPDATE users SET bounties={placeholder}, xp={placeholder}, level={placeholder} WHERE username={placeholder}", 
+            (bounties_json, xp, level, username)
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Bounties updated successfully"}), 200
+    except Exception as e:
+        print(f"Update bounties error: {e}")
         return jsonify({"error": "Database error"}), 500
 
 if __name__ == '__main__':

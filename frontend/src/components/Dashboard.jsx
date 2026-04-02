@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCcw, Leaf, Zap, Trash2, ArrowUpRight, CheckCircle2, Target, Clock, Trophy } from 'lucide-react';
+import { RefreshCcw, Leaf, Zap, Trash2, ArrowUpRight, CheckCircle2, Target, Clock, Trophy, Loader2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import SimulationEngine from './SimulationEngine';
 
@@ -8,16 +8,56 @@ export default function Dashboard({ userData, prediction, onReset }) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Interactive Gamification State
-  const [level, setLevel] = useState(4);
+  const [level, setLevel] = useState(1);
   const [xp, setXp] = useState(0);
-  const [bounties, setBounties] = useState([
-    { id: 1, title: 'Meatless Weekend', deadline: '2 days left', points: 50, progress: 0, status: 'active' },
-    { id: 2, title: 'Transit Pioneer', deadline: '5 days left', points: 120, progress: 40, status: 'active' },
-    { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
-  ]);
+  const [bounties, setBounties] = useState([]);
+  const [loadingBounties, setLoadingBounties] = useState(true);
+
+  // Sync with backend
+  useEffect(() => {
+    const fetchBounties = async () => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) return;
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/get-bounties?username=${user.username}`);
+        if (res.ok) {
+          const data = await res.json();
+          setXp(data.xp);
+          setLevel(data.level);
+          setBounties(data.bounties.length > 0 ? data.bounties : [
+            { id: 1, title: 'Meatless Weekend', deadline: '2 days left', points: 50, progress: 0, status: 'active' },
+            { id: 2, title: 'Transit Pioneer', deadline: '5 days left', points: 120, progress: 40, status: 'active' },
+            { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
+          ]);
+        }
+      } catch (err) { console.error(err); }
+      finally { setLoadingBounties(false); }
+    };
+    fetchBounties();
+  }, []);
+
+  const saveBounties = async (newBounties, newXp, newLevel) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) return;
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/update-bounties`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: user.username,
+          bounties: newBounties,
+          xp: newXp,
+          level: newLevel
+        })
+      });
+    } catch (err) { console.error(err); }
+  };
 
   const handleBountyClick = (id) => {
-    setBounties(prev => prev.map(b => {
+    let updatedXp = xp;
+    let updatedLevel = level;
+    
+    const updatedBounties = bounties.map(b => {
       if (b.id !== id) return b;
       
       if (b.status === 'pending') {
@@ -25,16 +65,24 @@ export default function Dashboard({ userData, prediction, onReset }) {
       }
       
       if (b.status === 'active') {
-        const newProgress = b.progress + 20; // Takes 5 clicks to complete
+        const newProgress = b.progress + 20; 
         if (newProgress >= 100) {
-          setXp(x => x + b.points); // Grant points
+          updatedXp += b.points;
+          // Level up logic every 500 XP
+          if (updatedXp >= updatedLevel * 500) {
+            updatedLevel += 1;
+          }
           return { ...b, progress: 100, status: 'completed' };
         }
         return { ...b, progress: newProgress };
       }
-      
       return b;
-    }));
+    });
+
+    setBounties(updatedBounties);
+    setXp(updatedXp);
+    setLevel(updatedLevel);
+    saveBounties(updatedBounties, updatedXp, updatedLevel);
   };
 
   const {
@@ -232,7 +280,11 @@ export default function Dashboard({ userData, prediction, onReset }) {
           </div>
           
           <div className="space-y-4 flex-1">
-            {bounties.map(bounty => (
+            {loadingBounties ? (
+              <div className="h-full flex items-center justify-center py-10 opacity-50">
+                <Loader2 size={32} className="animate-spin text-blue-500" />
+              </div>
+            ) : bounties.map(bounty => (
               <div 
                 key={bounty.id} 
                 onClick={() => handleBountyClick(bounty.id)}
