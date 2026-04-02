@@ -4,6 +4,12 @@ import { RefreshCcw, Leaf, Zap, Trash2, ArrowUpRight, CheckCircle2, Target, Cloc
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import SimulationEngine from './SimulationEngine';
 
+const DEFAULT_BOUNTIES = [
+  { id: 1, title: 'Meatless Weekend', deadline: '2 days left', points: 50, progress: 0, status: 'active' },
+  { id: 2, title: 'Transit Pioneer', deadline: '5 days left', points: 120, progress: 40, status: 'active' },
+  { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
+];
+
 export default function Dashboard({ userData, prediction, onReset }) {
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -22,15 +28,23 @@ export default function Dashboard({ userData, prediction, onReset }) {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/get-bounties?username=${user.username}`);
         if (res.ok) {
           const data = await res.json();
-          setXp(data.xp);
-          setLevel(data.level);
-          setBounties(data.bounties.length > 0 ? data.bounties : [
-            { id: 1, title: 'Meatless Weekend', deadline: '2 days left', points: 50, progress: 0, status: 'active' },
-            { id: 2, title: 'Transit Pioneer', deadline: '5 days left', points: 120, progress: 40, status: 'active' },
-            { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
-          ]);
+          setXp(data.xp || 0);
+          setLevel(data.level || 1);
+          
+          // Ensure we always have data to show
+          if (data.bounties && Array.isArray(data.bounties) && data.bounties.length > 0) {
+            setBounties(data.bounties);
+          } else {
+            setBounties(DEFAULT_BOUNTIES);
+          }
+        } else {
+          // Fallback if user doesn't exist yet in the bounty table
+          setBounties(DEFAULT_BOUNTIES);
         }
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+        console.error(err); 
+        setBounties(DEFAULT_BOUNTIES);
+      }
       finally { setLoadingBounties(false); }
     };
     fetchBounties();
