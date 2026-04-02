@@ -106,13 +106,13 @@ def predict():
     total_score = max(0, min(100, 100 - carbon_penalty - energy_penalty - waste_penalty))
     
     if total_score > 75:
-        category = "Eco-Warrior 🌱"
+        category = "Eco-Warrior"
     elif total_score > 55:
-        category = "Eco-Conscious 🌿"
+        category = "Eco-Conscious"
     elif total_score > 35:
         category = "Average Impact"
     else:
-        category = "High Impact ⚠️"
+        category = "High Impact"
     
     # --- Dynamic insights (Rule-based) ---
     insights = []
@@ -123,25 +123,33 @@ def predict():
     shopping_val = features[0][3]
     ac_val = features[0][4]
     
+    # 1. Transport Insight
     if travel_val == 3:
-        insights.append(f"🚗 Driving adds ~{round(12 * 3, 1)} units to your carbon footprint. Switching to public transport could cut it by 33%.")
+        insights.append(f"Driving adds ~{round(12 * 3, 1)} units to your carbon footprint. Switching to public transport could cut it by 33%.")
     elif travel_val == 2:
-        insights.append("🚌 Using public transport is great! Consider biking for even lower emissions.")
+        insights.append("Using public transport is great! Consider biking for even lower emissions.")
     else:
-        insights.append("🚲 Amazing! Biking/walking is the lowest-emission choice.")
+        insights.append("Amazing! Biking/walking is the lowest-emission choice.")
     
+    # 2. Power Insight
     if ac_val > 5:
-        insights.append(f"❄️ You use AC/heavy appliances {int(ac_val)} hrs/day — this is your biggest energy driver. Even 1 hr less saves ~7 kWh/month.")
+        insights.append(f"You use AC/heavy appliances {int(ac_val)} hrs/day — this is your biggest energy driver. Even 1 hr less saves ~7 kWh/month.")
     elif electricity_val > 6:
-        insights.append(f"💡 Your general electricity use ({int(electricity_val)} hrs/day) is above average. Smart power strips could help reduce standby waste.")
-    
-    if food_val == 3:
-        insights.append("🍖 A non-veg diet contributes significantly to your carbon score. Even 2 meatless days/week can make a big difference.")
+        insights.append(f"Your general electricity use ({int(electricity_val)} hrs/day) is above average. Smart power strips could help reduce standby waste.")
     else:
-        insights.append("🥬 Great choice! A plant-based diet keeps your food-related emissions low.")
+        insights.append(f"Energy usage ({int(electricity_val + ac_val)} hrs) is efficient. Further optimization can come from using energy-star appliances.")
+        
+    # 3. Food/Diet Insight
+    if food_val == 3:
+        insights.append("A non-veg diet contributes significantly to your carbon score. Even 2 meatless days/week can make a big difference.")
+    else:
+        insights.append("Great choice! A plant-based diet keeps your food-related emissions low.")
     
+    # 4. Shopping/Waste Insight
     if shopping_val > 4:
-        insights.append(f"🛒 Shopping {int(shopping_val)}x/week generates extra packaging waste. Try consolidating trips and buying in bulk.")
+        insights.append(f"Shopping {int(shopping_val)}x/week generates extra packaging waste. Try consolidating trips and buying in bulk.")
+    else:
+        insights.append("Your low frequency of shopping helps keep your waste generation below city averages. Keep it up!")
     
     return jsonify({
         "carbon_footprint": round(carbon_pred, 2),
