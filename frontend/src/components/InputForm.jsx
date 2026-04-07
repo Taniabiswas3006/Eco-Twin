@@ -47,11 +47,11 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
   const OptionCard = ({ label, value, field, icon: Icon, description }) => {
     const isSelected = formData[field] === value;
     return (
-      <div 
+      <div
         onClick={() => setFormData({ ...formData, [field]: value })}
         className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-2
-          ${isSelected 
-            ? 'border-eco-500 bg-eco-50 text-eco-800' 
+          ${isSelected
+            ? 'border-eco-500 bg-eco-50 text-eco-800'
             : 'border-neutral-200 hover:border-eco-300 bg-white hover:bg-neutral-50 text-neutral-600'
           }`}
       >
@@ -64,20 +64,20 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
 
   return (
     <div className="w-full max-w-2xl mx-auto glass-card p-4 sm:p-10 pt-16 sm:pt-16 mt-10 relative">
-      <button 
+      <button
         onClick={onLogout}
         className="absolute top-4 left-4 flex items-center gap-2 text-neutral-400 hover:text-neutral-800 transition-colors text-sm font-medium bg-neutral-100/50 hover:bg-neutral-200 px-3 py-1.5 rounded-full"
       >
-        <ArrowLeft size={16} /> Log Out
+        Log Out
       </button>
 
       <div className="flex justify-between items-center mb-8 text-neutral-400 text-sm font-medium">
         <span>Step {currentStep + 1} of {steps.length}</span>
         <div className="flex gap-1">
           {steps.map((_, i) => (
-            <div 
-              key={i} 
-              className={`h-1.5 rounded-full transition-all duration-300 ${i === currentStep ? 'w-6 bg-eco-500' : i < currentStep ? 'w-2 bg-eco-300' : 'w-2 bg-neutral-200'}`} 
+            <div
+              key={i}
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === currentStep ? 'w-6 bg-eco-500' : i < currentStep ? 'w-2 bg-eco-300' : 'w-2 bg-neutral-200'}`}
             />
           ))}
         </div>
@@ -180,7 +180,7 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
               <div className="py-2">
                 <div className="flex flex-col gap-3 max-w-sm mx-auto">
                   <p className="text-neutral-500 text-sm font-medium ml-1">Current Residence</p>
-                  
+
                   <div className="relative">
                     <button
                       onClick={() => setShowRegionDrop(!showRegionDrop)}
@@ -215,7 +215,7 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
                       )}
                     </AnimatePresence>
                   </div>
-                  
+
                   <p className="text-[11px] text-neutral-400 mt-2 px-1 italic">We use this to estimate local carbon intensity of your electrical grid.</p>
                 </div>
               </div>

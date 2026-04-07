@@ -10,7 +10,7 @@ const DEFAULT_BOUNTIES = [
   { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
 ];
 
-export default function Dashboard({ userData, prediction, onReset }) {
+export default function Dashboard({ user, userData, prediction, onReset }) {
   const [activeTab, setActiveTab] = useState('overview');
 
   // Interactive Gamification State
@@ -22,10 +22,11 @@ export default function Dashboard({ userData, prediction, onReset }) {
   // Sync with backend
   useEffect(() => {
     const fetchBounties = async () => {
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user) return;
+      // Use the user prop if available, otherwise fallback to localStorage
+      const currentUser = user || JSON.parse(localStorage.getItem('user'));
+      if (!currentUser) return;
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/get-bounties?username=${user.username}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/get-bounties?username=${currentUser.username}`);
         if (res.ok) {
           const data = await res.json();
           setXp(data.xp || 0);
@@ -48,17 +49,17 @@ export default function Dashboard({ userData, prediction, onReset }) {
       finally { setLoadingBounties(false); }
     };
     fetchBounties();
-  }, []);
+  }, [user]); // Add user as dependency
 
   const saveBounties = async (newBounties, newXp, newLevel) => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user) return;
+    const currentUser = user || JSON.parse(localStorage.getItem('user'));
+    if (!currentUser) return;
     try {
       await fetch(`${import.meta.env.VITE_API_URL}/update-bounties`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: user.username,
+          username: currentUser.username,
           bounties: newBounties,
           xp: newXp,
           level: newLevel
@@ -133,10 +134,12 @@ export default function Dashboard({ userData, prediction, onReset }) {
     <div className="w-full max-w-[90rem] mx-auto space-y-6">
       
       {/* Top Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex justify-between items-end transition-all">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-neutral-900">Your Digital Twin</h1>
-          <p className="text-neutral-500 mt-1">Modeling your lifestyle impact</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 animate-in slide-in-from-left duration-500">
+            Welcome, <span className="text-eco-600 capitalize">{user?.username || 'Eco User'}</span>
+          </h1>
+          <p className="text-neutral-500 mt-1 font-medium italic">Here is your digital twin dashboard</p>
         </div>
         <button 
           onClick={onReset}

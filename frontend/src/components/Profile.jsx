@@ -10,10 +10,25 @@ export default function Profile({ user: initialUser }) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (initialUser) {
-        setUser(initialUser);
-        setEditedData(initialUser);
-    }
+    const fetchUserDetails = async () => {
+      if (!initialUser?.username) return;
+      setIsLoading(true);
+      try {
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-profile?username=${initialUser.username}`);
+        if (resp.ok) {
+          const data = await resp.json();
+          const fullUser = { ...initialUser, ...data };
+          setUser(fullUser);
+          setEditedData(fullUser);
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserDetails();
   }, [initialUser]);
 
   const handleSaveBasic = async () => {
@@ -43,9 +58,9 @@ export default function Profile({ user: initialUser }) {
   };
 
   const profileItems = [
-    { key: 'name', label: 'Full Name', value: user?.name || 'Tania Biswas', icon: <User size={18} /> },
-    { key: 'email', label: 'Email Address', value: user?.email || user?.username + '@example.com', icon: <Mail size={18} />, readonly: true },
-    { key: 'phone', label: 'Phone Number', value: user?.phone || '+91 98765 43210', icon: <Phone size={18} /> },
+    { key: 'name', label: 'Full Name', value: user?.name || 'Not provided', icon: <User size={18} /> },
+    { key: 'email', label: 'Email Address', value: user?.email || 'Not provided', icon: <Mail size={18} />, readonly: true },
+    { key: 'phone', label: 'Phone Number', value: user?.phone || 'Not provided', icon: <Phone size={18} /> },
   ];
 
   const settingsItems = [

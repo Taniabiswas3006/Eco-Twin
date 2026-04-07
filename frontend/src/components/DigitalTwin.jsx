@@ -146,6 +146,7 @@ export default function DigitalTwin() {
               className="w-full"
             >
               <Dashboard 
+                user={user}
                 userData={userData} 
                 prediction={prediction} 
                 onReset={resetJourney} 

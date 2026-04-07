@@ -277,6 +277,7 @@ def init_db():
         c.execute('''CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
             username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             name TEXT DEFAULT '',
             phone TEXT DEFAULT '',
@@ -288,6 +289,7 @@ def init_db():
         )''')
         # Handle existing table
         try:
+            c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT UNIQUE")
             c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS settings TEXT DEFAULT '{}'")
             c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS bounties TEXT DEFAULT '[]'")
             c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0")
@@ -299,6 +301,7 @@ def init_db():
         c.execute('''CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
             name TEXT DEFAULT '',
             phone TEXT DEFAULT '',
@@ -310,7 +313,7 @@ def init_db():
         )''')
         # SQLite column check
         try:
-            c.execute("ALTER TABLE users ADD COLUMN settings TEXT DEFAULT '{}'")
+            c.execute("ALTER TABLE users ADD COLUMN email TEXT") # SQLite unique on alter is tricky, so simplified
         except: pass
         try:
             c.execute("ALTER TABLE users ADD COLUMN bounties TEXT DEFAULT '[]'")
@@ -334,10 +337,10 @@ except Exception as e:
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
-    if not data or 'username' not in data or 'password' not in data:
-        return jsonify({"error": "Username and password required"}), 400
+    if not data or 'username' not in data or 'password' not in data or 'email' not in data:
+        return jsonify({"error": "Username, email and password are required"}), 400
         
-    username, password = data['username'], data['password']
+    username, password, email = data['username'], data['password'], data['email']
     name = data.get('name', '')
     phone = data.get('phone', '')
     gender = data.get('gender', '')
@@ -351,12 +354,12 @@ def signup():
         placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
         
         c.execute(
-            f"INSERT INTO users (username, password, name, phone, gender) VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})", 
-            (username, hashed_password, name, phone, gender)
+            f"INSERT INTO users (username, email, password, name, phone, gender) VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})", 
+            (username, email, hashed_password, name, phone, gender)
         )
         conn.commit()
         conn.close()
-        return jsonify({"message": "User created successfully", "username": username, "token": "dummy-jwt-token"}), 201
+        return jsonify({"message": "User created successfully", "username": username, "email": email, "token": "dummy-jwt-token"}), 201
     except Exception as e:
         # Check for unique constraint violation across both DB types
         if "UNIQUE constraint failed" in str(e) or "duplicate key value" in str(e):
@@ -369,10 +372,10 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
-    if not data or 'username' not in data or 'password' not in data:
-        return jsonify({"error": "Username and password required"}), 400
+    if not data or 'username' not in data or 'password' not in data or 'email' not in data:
+        return jsonify({"error": "Username, email and password are required"}), 400
         
-    username, password = data['username'], data['password']
+    username, password, email = data['username'], data['password'], data['email']
     
     try:
         conn = get_db_connection()
@@ -381,17 +384,52 @@ def login():
         # Use '?' for SQLite, '%s' for PostgreSQL
         placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
         
-        c.execute(f"SELECT password FROM users WHERE username = {placeholder}", (username,))
+        c.execute(f"SELECT password FROM users WHERE username = {placeholder} AND email = {placeholder}", (username, email))
         row = c.fetchone()
         conn.close()
         
         if row and check_password_hash(row[0], password):
             return jsonify({"message": "Login successful", "username": username, "token": "dummy-jwt-token"}), 200
         else:
-            return jsonify({"error": "Invalid username or password"}), 401
+            return jsonify({"error": "Invalid username, email or password"}), 401
     except Exception as e:
         print(f"Login error: {e}")
         if 'conn' in locals(): conn.close()
+        return jsonify({"error": "Database error"}), 500
+
+@app.route('/get-profile', methods=['GET'])
+def get_profile():
+    username = request.args.get('username')
+    if not username:
+        return jsonify({"error": "Username required"}), 400
+        
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
+        c.execute(f"SELECT name, email, phone, gender FROM users WHERE username={placeholder}", (username,))
+        row = c.fetchone()
+        conn.close()
+        
+        if row:
+            # Handle both SQLite (Row) and PostgreSQL (Tuple)
+            if hasattr(row, 'keys'): # SQLite
+                return jsonify({
+                    "name": row['name'] or '',
+                    "email": row['email'] or '',
+                    "phone": row['phone'] or '',
+                    "gender": row['gender'] or ''
+                }), 200
+            else: # PostgreSQL/Tuple
+                return jsonify({
+                    "name": row[0] or '',
+                    "email": row[1] or '',
+                    "phone": row[2] or '',
+                    "gender": row[3] or ''
+                }), 200
+        return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        print(f"Get profile error: {e}")
         return jsonify({"error": "Database error"}), 500
 
 @app.route('/update-profile', methods=['POST'])

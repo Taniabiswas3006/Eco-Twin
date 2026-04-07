@@ -23,6 +23,7 @@ import authBg from '@/assets/ecotwin_auth.png';
 
 const loginSchema = z.object({
   username: z.string().min(3, { message: "Username must be at least 3 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
   rememberMe: z.boolean().default(false).optional(),
 });
@@ -30,9 +31,10 @@ const loginSchema = z.object({
 const signupSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   username: z.string().min(3, { message: "Username must be at least 3 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
   phone: z.string().regex(/^\d{10}$/, { message: "Phone number must be exactly 10 digits." }),
-  gender: z.enum(["female", "male", "non-binary", "prefer-not-to-say"], {
-    required_error: "Please select your gender."
+  gender: z.enum(["female", "male", "non-binary", "prefer-not-to-say"], { 
+    required_error: "Please select your gender." 
   }),
   password: z.string().min(8, { message: "Password must be at least 8 characters." }),
   agreeTerms: z.boolean().refine(val => val === true, { message: "You must agree to the terms." }),
@@ -50,11 +52,13 @@ export default function AuthPage({ mode = 'login' }) {
     resolver: zodResolver(formSchema),
     defaultValues: isLogin ? {
       username: "",
+      email: "",
       password: "",
       rememberMe: false,
     } : {
       name: "",
       username: "",
+      email: "",
       phone: "",
       gender: "",
       password: "",
@@ -193,6 +197,22 @@ export default function AuthPage({ mode = 'login' }) {
                     </motion.div>
                   </div>
                 )}
+
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="jane@example.com" {...field} disabled={isLoading} className="rounded-xl h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
 
                 <motion.div variants={itemVariants}>
                   <FormField
