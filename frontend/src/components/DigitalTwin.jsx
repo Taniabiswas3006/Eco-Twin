@@ -102,7 +102,7 @@ export default function DigitalTwin() {
 
   if (!showSidebar) {
     return (
-      <div className="w-full relative mt-16 animate-in fade-in duration-700">
+      <div className="w-full relative mt-12 sm:mt-16 px-2 sm:px-0 animate-in fade-in duration-700">
         <AnimatePresence mode="wait">
           <motion.div
             key="form"
@@ -125,7 +125,7 @@ export default function DigitalTwin() {
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50 fixed inset-0 overflow-x-hidden z-[100] animate-in fade-in duration-500">
+    <div className="flex min-h-screen bg-neutral-50 fixed inset-0 overflow-x-hidden z-[100] animate-in fade-in duration-500 flex-col md:flex-row">
       {/* Sidebar - Visible once twin is created or on certain tabs */}
       <Sidebar 
         activeTab={activeTab} 
@@ -135,7 +135,7 @@ export default function DigitalTwin() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 ml-64 p-12 transition-all duration-300 overflow-y-auto">
+      <main className="flex-1 ml-0 md:ml-64 p-4 pt-16 sm:p-6 sm:pt-16 md:p-8 lg:p-12 md:pt-12 transition-all duration-300 overflow-y-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' ? (
             <motion.div

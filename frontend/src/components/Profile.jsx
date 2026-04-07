@@ -76,12 +76,12 @@ export default function Profile({ user: initialUser }) {
   ];
 
   return (
-    <div className="max-w-3xl mx-auto py-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="max-w-3xl mx-auto py-4 px-2 sm:px-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Hero Header */}
-      <div className="flex flex-col items-center text-center mb-12">
+      <div className="flex flex-col items-center text-center mb-8 sm:mb-12">
         <div className="relative mb-6">
-          <div className="w-28 h-28 rounded-full bg-white border border-neutral-100 p-1.5 shadow-sm">
-            <div className="w-full h-full rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400 font-bold text-3xl overflow-hidden border border-neutral-100 uppercase">
+          <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full bg-white border border-neutral-100 p-1 sm:p-1.5 shadow-sm">
+            <div className="w-full h-full rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400 font-bold text-2xl sm:text-3xl overflow-hidden border border-neutral-100 uppercase">
               {user?.username?.charAt(0) || 'T'}
             </div>
           </div>
@@ -90,10 +90,10 @@ export default function Profile({ user: initialUser }) {
           </button>
         </div>
         
-        <h1 className="text-2xl font-bold text-neutral-900 tracking-tight">{user?.username || 'Eco Enthusiast'}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">{user?.username || 'Eco Enthusiast'}</h1>
         <p className="text-neutral-400 text-sm mt-1 mb-4">Silver Tier Member • Joined Mar 2026</p>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap justify-center">
           <span className="px-3 py-1 bg-eco-50 text-eco-700 text-[11px] font-bold rounded-full uppercase tracking-widest border border-eco-100/50">
             Certified Eco-User
           </span>

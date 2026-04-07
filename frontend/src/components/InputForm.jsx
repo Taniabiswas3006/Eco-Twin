@@ -224,20 +224,20 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
         </AnimatePresence>
       </div>
 
-      <div className="mt-8 flex justify-end gap-3">
+      <div className="mt-6 sm:mt-8 flex flex-wrap justify-end gap-2 sm:gap-3">
         {hasPrevious && (
           <button
             onClick={onLoadPrevious}
-            className="mr-auto px-6 py-3 rounded-full font-medium flex items-center gap-2 text-eco-600 bg-eco-50 hover:bg-eco-100 transition-all active:scale-95"
+            className="mr-auto px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium flex items-center gap-2 text-eco-600 bg-eco-50 hover:bg-eco-100 transition-all active:scale-95 text-xs sm:text-sm"
           >
-            Load Previous Data
+            Load Previous
           </button>
         )}
         {currentStep > 0 && (
           <button
             onClick={prevStep}
             disabled={isLoading}
-            className="px-6 py-3 rounded-full font-medium flex items-center gap-2 text-neutral-600 hover:bg-neutral-100 transition-all active:scale-95 disabled:opacity-70"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium flex items-center gap-2 text-neutral-600 hover:bg-neutral-100 transition-all active:scale-95 disabled:opacity-70 text-xs sm:text-sm"
           >
             Previous
           </button>
@@ -245,14 +245,14 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
         <button
           onClick={nextStep}
           disabled={isLoading}
-          className="bg-eco-600 hover:bg-eco-700 text-white px-8 py-3 rounded-full font-medium flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-lg shadow-eco-600/20"
+          className="bg-eco-600 hover:bg-eco-700 text-white px-5 sm:px-8 py-2.5 sm:py-3 rounded-full font-medium flex items-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-lg shadow-eco-600/20 text-xs sm:text-sm"
         >
           {isLoading ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : currentStep === steps.length - 1 ? (
             'Calculate Twin'
           ) : (
-            <>Next <ArrowRight size={18} /></>
+            <>Next <ArrowRight size={16} /></>
           )}
         </button>
       </div>

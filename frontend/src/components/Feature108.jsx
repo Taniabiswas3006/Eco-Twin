@@ -54,16 +54,16 @@ const Feature108 = ({
   ],
 }) => {
   return (
-    <section className="pt-8 pb-32 bg-eco-50/10">
+    <section className="pt-8 pb-16 sm:pb-32 bg-eco-50/10 px-4 sm:px-6">
       <div className="container mx-auto">
         <div className="flex flex-col items-center gap-4 text-center">
           <Badge variant="outline" className="px-4 py-1 text-sm font-semibold uppercase tracking-wider text-eco-500 border-eco-200">
             {badge}
           </Badge>
-          <h1 className="max-w-2xl text-4xl font-extrabold md:text-5xl tracking-tight text-neutral-900 leading-[1.1]">
+          <h1 className="max-w-2xl text-2xl sm:text-3xl md:text-4xl font-extrabold md:text-5xl tracking-tight text-neutral-900 leading-[1.1]">
             {heading}
           </h1>
-          <p className="text-neutral-500 max-w-2xl text-lg font-medium leading-relaxed">
+          <p className="text-neutral-500 max-w-2xl text-base sm:text-lg font-medium leading-relaxed px-2">
             {description}
           </p>
         </div>
@@ -79,21 +79,21 @@ const Feature108 = ({
               </TabsTrigger>
             ))}
           </TabsList>
-          <div className="mx-auto mt-8 max-w-screen-xl rounded-3xl bg-white/70 backdrop-blur-md border border-neutral-100 p-8 lg:p-16 shadow-apple">
+          <div className="mx-auto mt-6 sm:mt-8 max-w-screen-xl rounded-2xl sm:rounded-3xl bg-white/70 backdrop-blur-md border border-neutral-100 p-4 sm:p-8 lg:p-16 shadow-apple">
             {tabs.map((tab) => (
               <TabsContent
                 key={tab.value}
                 value={tab.value}
-                className="grid place-items-center gap-20 lg:grid-cols-2 lg:gap-10 focus:outline-none"
+                className="grid place-items-center gap-8 sm:gap-12 lg:grid-cols-2 lg:gap-10 focus:outline-none"
               >
                 <div className="flex flex-col gap-6">
                   <Badge variant="outline" className="w-fit bg-eco-50 text-eco-600 border-eco-200/50 font-bold px-3 py-1">
                     {tab.content.badge}
                   </Badge>
-                  <h3 className="text-3xl font-extrabold text-neutral-900 lg:text-5xl leading-tight">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-neutral-900 lg:text-5xl leading-tight">
                     {tab.content.title}
                   </h3>
-                  <p className="text-neutral-500 lg:text-xl font-medium leading-relaxed">
+                  <p className="text-neutral-500 text-sm sm:text-base lg:text-xl font-medium leading-relaxed">
                     {tab.content.description}
                   </p>
                   <Button variant="default" className="mt-4 w-fit h-auto px-8 py-4 text-lg font-bold rounded-full bg-eco-500 hover:bg-eco-600 shadow-lg shadow-eco-500/20 transition-all active:scale-95 text-white">
@@ -104,7 +104,7 @@ const Feature108 = ({
                   <img
                     src={tab.content.imageSrc}
                     alt={tab.content.imageAlt}
-                    className="rounded-[2.5rem] object-cover w-full aspect-[4/3] shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
+                    className="rounded-xl sm:rounded-[2.5rem] object-cover w-full aspect-[4/3] shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]"
                   />
                   <div className="absolute inset-0 rounded-[2.5rem] ring-1 ring-inset ring-neutral-900/10" />
                 </div>

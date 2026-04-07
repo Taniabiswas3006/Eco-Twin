@@ -50,7 +50,7 @@ function App() {
   return (
     <div className="flex flex-col relative min-h-screen">
       {/* Soft background blobs */}
-      <div className="absolute top-[-5%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-eco-100 blur-[100px] opacity-60 pointer-events-none" />
+      <div className="hidden sm:block absolute top-[-5%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-eco-100 blur-[100px] opacity-60 pointer-events-none" />
 
       <main className="w-full z-10 flex-1 flex flex-col relative">
         <Routes>

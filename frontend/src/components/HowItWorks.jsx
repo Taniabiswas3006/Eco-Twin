@@ -37,7 +37,7 @@ export default function HowItWorks() {
   return (
     <div className="min-h-screen bg-neutral-50 font-sans selection:bg-eco-200 text-neutral-900 pb-24">
       {/* Navbar Minimal */}
-      <nav className="w-full max-w-7xl mx-auto px-8 py-8 flex justify-between items-center z-20 relative">
+      <nav className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-8 flex justify-between items-center z-20 relative">
         <Link to="/" className="flex items-center gap-2 group">
            <div className="w-10 h-10 rounded-full bg-white border border-neutral-200 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
              <ArrowLeft size={18} className="text-neutral-500 group-hover:text-neutral-900" />
@@ -51,7 +51,7 @@ export default function HowItWorks() {
       </nav>
 
       {/* Header */}
-      <header className="w-full max-w-4xl mx-auto px-8 pt-12 pb-24 text-center relative z-10">
+      <header className="w-full max-w-4xl mx-auto px-4 sm:px-8 pt-8 sm:pt-12 pb-12 sm:pb-24 text-center relative z-10">
         <motion.div
            initial={{ opacity: 0, scale: 0.9 }}
            animate={{ opacity: 1, scale: 1 }}
@@ -65,7 +65,7 @@ export default function HowItWorks() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-4 sm:mb-6"
         >
           How the Engine <span className="text-neutral-300">Works.</span>
         </motion.h1>
@@ -74,17 +74,17 @@ export default function HowItWorks() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xl text-neutral-500 font-medium max-w-2xl mx-auto leading-relaxed"
+          className="text-base sm:text-lg md:text-xl text-neutral-500 font-medium max-w-2xl mx-auto leading-relaxed px-2"
         >
           EcoTwin is built on a high-fidelity rendering pipeline that translates your daily habits into a simulated, predictive reality.
         </motion.p>
       </header>
 
       {/* Stepper / Timeline */}
-      <div className="w-full max-w-5xl mx-auto px-8 relative z-10">
+      <div className="w-full max-w-5xl mx-auto px-4 sm:px-8 relative z-10">
         <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-neutral-200 to-transparent -translate-x-1/2 z-0 hidden md:block" />
         
-        <div className="space-y-24 md:space-y-40">
+        <div className="space-y-12 sm:space-y-24 md:space-y-40">
           {steps.map((step, index) => (
             <motion.div 
               key={step.id}
@@ -95,7 +95,7 @@ export default function HowItWorks() {
               className={`flex flex-col md:flex-row items-center gap-8 md:gap-16 ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}
             >
               {/* Image / Graphic Side */}
-              <div className="flex-1 w-full bg-white rounded-[2.5rem] p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center min-h-[300px] relative overflow-hidden group">
+              <div className="flex-1 w-full bg-white rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.05)] border border-neutral-100 flex items-center justify-center min-h-[200px] sm:min-h-[300px] relative overflow-hidden group">
                 <div className={`absolute inset-0 bg-${step.color}-500 opacity-5 blur-3xl rounded-full scale-150 group-hover:scale-100 transition-transform duration-1000`} />
                 <div className={`w-24 h-24 rounded-2xl bg-${step.color}-50 border-2 border-${step.color}-100 flex items-center justify-center relative z-10 shadow-inner transform group-hover:rotate-6 transition-transform duration-500`}>
                   {step.icon}
@@ -104,11 +104,11 @@ export default function HowItWorks() {
 
               {/* Text Side */}
               <div className="flex-1 w-full relative z-10">
-                <div className={`text-[120px] font-black text-neutral-100 leading-none absolute -top-16 -left-8 -z-10 select-none`}>
+                <div className={`text-[80px] sm:text-[120px] font-black text-neutral-100 leading-none absolute -top-8 sm:-top-16 -left-4 sm:-left-8 -z-10 select-none`}>
                   {step.id}
                 </div>
-                <h3 className="text-3xl font-extrabold text-neutral-900 mb-4 tracking-tight shadow-sm">{step.title}</h3>
-                <p className="text-lg text-neutral-500 leading-relaxed font-medium">{step.description}</p>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-neutral-900 mb-3 sm:mb-4 tracking-tight shadow-sm">{step.title}</h3>
+                <p className="text-sm sm:text-base md:text-lg text-neutral-500 leading-relaxed font-medium">{step.description}</p>
               </div>
             </motion.div>
           ))}
@@ -120,11 +120,11 @@ export default function HowItWorks() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-3xl mx-auto text-center mt-40 px-8"
+        className="w-full max-w-3xl mx-auto text-center mt-20 sm:mt-40 px-4 sm:px-8"
       >
-        <h2 className="text-4xl font-extrabold tracking-tight mb-8">Ready to meet your Twin?</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight mb-6 sm:mb-8">Ready to meet your Twin?</h2>
         <Link to="/signup">
-          <button className="bg-neutral-900 hover:bg-neutral-800 text-white px-10 py-5 rounded-full font-bold text-lg transition-transform active:scale-95 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)]">
+          <button className="bg-neutral-900 hover:bg-neutral-800 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-base sm:text-lg transition-transform active:scale-95 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)]">
             Launch Simulation Engine
           </button>
         </Link>

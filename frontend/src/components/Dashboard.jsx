@@ -134,12 +134,12 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
     <div className="w-full max-w-[90rem] mx-auto space-y-6">
       
       {/* Top Header */}
-      <div className="flex justify-between items-end transition-all">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 transition-all">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 animate-in slide-in-from-left duration-500">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900 animate-in slide-in-from-left duration-500">
             Welcome, <span className="text-eco-600 capitalize">{user?.username || 'Eco User'}</span>
           </h1>
-          <p className="text-neutral-500 mt-1 font-medium italic">Here is your digital twin dashboard</p>
+          <p className="text-neutral-500 mt-1 font-medium italic text-sm sm:text-base">Here is your digital twin dashboard</p>
         </div>
         <button 
           onClick={onReset}
@@ -152,7 +152,7 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Main Score Card */}
-        <div className="lg:col-span-1 glass-card p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div className="lg:col-span-1 glass-card p-5 sm:p-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-eco-100 rounded-full blur-2xl opacity-50" />
           
           <span className="text-neutral-500 font-medium mb-2 uppercase tracking-wider text-sm">Sustainability Score</span>
@@ -189,17 +189,17 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
         </div>
 
         {/* Metrics & Chart */}
-        <div className="lg:col-span-2 glass-card p-8 flex flex-col">
-          <div className="flex gap-4 mb-6 border-b border-neutral-100 pb-4">
+        <div className="lg:col-span-2 glass-card p-4 sm:p-8 flex flex-col">
+          <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6 border-b border-neutral-100 pb-4 overflow-x-auto">
             <button 
               onClick={() => setActiveTab('overview')}
-              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors ${activeTab === 'overview' ? 'border-neutral-900 text-neutral-900 dark:border-white' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
+              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'overview' ? 'border-neutral-900 text-neutral-900 dark:border-white' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
             >
               Overview
             </button>
             <button 
               onClick={() => setActiveTab('simulation')}
-              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors ${activeTab === 'simulation' ? 'border-neutral-900 text-neutral-900 dark:border-white' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
+              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'simulation' ? 'border-neutral-900 text-neutral-900 dark:border-white' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
             >
               Simulation Engine
             </button>
@@ -211,41 +211,42 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
                 <motion.div 
                   key="overview"
                   initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
-                  className="flex flex-col h-[400px]"
+                  className="flex flex-col min-h-[350px] sm:h-[400px]"
                 >
-                  <div className="grid grid-cols-3 gap-4 mb-8">
-                    <div className="bg-neutral-50 p-4 rounded-xl">
-                      <div className="flex items-center gap-2 mb-2 text-neutral-500 font-medium text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <div className="bg-neutral-50 p-3 sm:p-4 rounded-xl">
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2 text-neutral-500 font-medium text-xs sm:text-sm">
                         {getMetricIcon('carbon')} Carbon
                       </div>
-                      <div className="text-2xl font-bold">{carbon_footprint}<span className="text-sm text-neutral-400 font-normal ml-1">kg</span></div>
+                      <div className="text-xl sm:text-2xl font-bold">{carbon_footprint}<span className="text-xs sm:text-sm text-neutral-400 font-normal ml-1">kg</span></div>
                     </div>
-                    <div className="bg-neutral-50 p-4 rounded-xl">
-                      <div className="flex items-center gap-2 mb-2 text-neutral-500 font-medium text-sm">
+                    <div className="bg-neutral-50 p-3 sm:p-4 rounded-xl">
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2 text-neutral-500 font-medium text-xs sm:text-sm">
                         {getMetricIcon('energy')} Energy
                       </div>
-                      <div className="text-2xl font-bold">{energy_consumption}<span className="text-sm text-neutral-400 font-normal ml-1">kWh</span></div>
+                      <div className="text-xl sm:text-2xl font-bold">{energy_consumption}<span className="text-xs sm:text-sm text-neutral-400 font-normal ml-1">kWh</span></div>
                     </div>
-                    <div className="bg-neutral-50 p-4 rounded-xl">
-                      <div className="flex items-center gap-2 mb-2 text-neutral-500 font-medium text-sm">
+                    <div className="bg-neutral-50 p-3 sm:p-4 rounded-xl">
+                      <div className="flex items-center gap-2 mb-1 sm:mb-2 text-neutral-500 font-medium text-xs sm:text-sm">
                         {getMetricIcon('waste')} Waste
                       </div>
-                      <div className="text-2xl font-bold">{waste_generation}<span className="text-sm text-neutral-400 font-normal ml-1">kg</span></div>
+                      <div className="text-xl sm:text-2xl font-bold">{waste_generation}<span className="text-xs sm:text-sm text-neutral-400 font-normal ml-1">kg</span></div>
                     </div>
                   </div>
 
-                  <div className="flex-1 min-h-[200px]">
-                    <h3 className="text-sm font-medium text-neutral-500 mb-4 uppercase tracking-wider">Impact Breakdown</h3>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 25 }}>
+
+                  <div className="w-full h-[250px] sm:h-[280px]">
+                    <h3 className="text-xs sm:text-sm font-medium text-neutral-500 mb-3 sm:mb-4 uppercase tracking-wider">Impact Breakdown</h3>
+                    <ResponsiveContainer width="100%" height="85%">
+                      <BarChart data={chartData} margin={{ top: 0, right: 0, left: -20, bottom: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 13, fontWeight: 'bold'}} dy={15} />
-                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 13, fontWeight: 'bold'}} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12, fontWeight: 'bold'}} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12, fontWeight: 'bold'}} />
                         <Tooltip 
                           cursor={{fill: '#F3F4F6'}}
                           contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
                         />
-                        <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={60}>
+                        <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={50}>
                           {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.fill} />
                           ))}
@@ -269,26 +270,26 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Insights Section */}
-        <div className="glass-card p-8 lg:col-span-2">
-          <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+        <div className="glass-card p-5 sm:p-8 lg:col-span-2">
+          <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6 flex items-center gap-2">
             <Zap size={20} className="text-eco-500" /> Actionable Insights
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {insights.map((insight, idx) => (
-              <div key={idx} className="bg-neutral-50 border border-neutral-100 p-5 rounded-xl flex items-center gap-4">
+              <div key={idx} className="bg-neutral-50 border border-neutral-100 p-4 sm:p-5 rounded-xl flex items-center gap-3 sm:gap-4">
                 <div className="bg-white p-2 rounded-lg shadow-sm flex-shrink-0">
                   <ArrowUpRight size={18} className="text-neutral-600" />
                 </div>
-                <p className="text-neutral-800 leading-relaxed text-base font-bold">{insight}</p>
+                <p className="text-neutral-800 leading-relaxed text-sm sm:text-base font-bold">{insight}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Gamified Missions Section */}
-        <div className="glass-card p-8 flex flex-col bg-gradient-to-br from-white to-blue-50/30">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
+        <div className="glass-card p-5 sm:p-8 flex flex-col bg-gradient-to-br from-white to-blue-50/30">
+          <div className="flex justify-between items-center mb-4 sm:mb-6 flex-wrap gap-2">
+            <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
               <Target size={20} className="text-blue-500" /> Active Bounties
             </h3>
             <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 transition-all">

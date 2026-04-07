@@ -96,11 +96,11 @@ export default function Settings() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto py-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <header className="mb-10 flex justify-between items-end">
+    <div className="max-w-3xl mx-auto py-4 px-2 sm:px-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <header className="mb-6 sm:mb-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Settings</h1>
-          <p className="text-neutral-500 text-sm mt-2">Personalize your experience and manage preferences.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">Settings</h1>
+          <p className="text-neutral-500 text-xs sm:text-sm mt-2">Personalize your experience and manage preferences.</p>
         </div>
         {message && (
           <motion.span 
@@ -116,9 +116,9 @@ export default function Settings() {
       <div className="space-y-10">
         <section>
           <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-[0.2em] mb-4 px-1">Appearance</h3>
-          <div className="bg-white border border-neutral-100 rounded-[24px] overflow-hidden shadow-sm">
+          <div className="bg-white border border-neutral-100 rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-sm">
             {/* Theme Toggle */}
-            <div className="flex items-center justify-between p-6 border-b border-neutral-50">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-neutral-50">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-neutral-50 flex items-center justify-center text-neutral-500 border border-neutral-100/50">
                   {theme === 'light' ? <Sun size={20} /> : <Moon size={20} />}
@@ -130,14 +130,14 @@ export default function Settings() {
               </div>
               <button 
                 onClick={toggleTheme}
-                className={`relative w-14 h-7 rounded-full transition-colors duration-300 ${theme === 'dark' ? 'bg-neutral-800' : 'bg-neutral-200'}`}
+                className={`relative w-10 h-5 sm:w-14 sm:h-7 rounded-full transition-colors duration-300 flex-shrink-0 ${theme === 'dark' ? 'bg-eco-600' : 'bg-neutral-200'}`}
               >
-                <div className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-7' : 'translate-x-0'}`} />
+                <div className={`absolute top-0.5 sm:top-1 left-0.5 sm:left-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white shadow-md transform transition-transform duration-300 ${theme === 'dark' ? 'translate-x-5 sm:translate-x-7' : 'translate-x-0'}`} />
               </button>
             </div>
 
             {/* Language Selector */}
-            <div className="flex items-center justify-between p-6">
+            <div className="flex items-center justify-between p-4 sm:p-6">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-neutral-50 flex items-center justify-center text-neutral-500 border border-neutral-100/50">
                   <Globe size={20} />
@@ -164,8 +164,8 @@ export default function Settings() {
 
         <section>
           <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-[0.2em] mb-4 px-1">Privacy & Data</h3>
-          <div className="bg-white border border-neutral-100 rounded-[24px] overflow-hidden shadow-sm">
-            <div className="flex items-center justify-between p-6 border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors cursor-pointer group">
+          <div className="bg-white border border-neutral-100 rounded-[16px] sm:rounded-[24px] overflow-hidden shadow-sm">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors cursor-pointer group">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-neutral-50 flex items-center justify-center text-neutral-500 border border-neutral-100/50">
                   <Shield size={20} />
@@ -182,7 +182,7 @@ export default function Settings() {
           </div>
         </section>
 
-        <div className="pt-8 border-t border-neutral-100 flex items-center justify-between px-4">
+        <div className="pt-6 sm:pt-8 border-t border-neutral-100 flex items-center justify-between px-2 sm:px-4">
           <div>
             <p className="text-xs font-bold text-neutral-900 uppercase tracking-widest mb-1">EcoTwin Version</p>
             <p className="text-[11px] text-neutral-400 font-medium">v1.2.4-stable • Production Build</p>

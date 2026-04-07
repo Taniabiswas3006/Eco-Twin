@@ -285,17 +285,17 @@ export default function AuthPage({ mode = 'login' }) {
                       control={form.control}
                       name="rememberMe"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormItem className="flex flex-row items-start space-x-2 sm:space-x-3 space-y-0">
                           <FormControl>
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               disabled={isLoading}
-                              className="data-[state=checked]:bg-eco-600 border-eco-200"
+                              className="data-[state=checked]:bg-eco-600 border-eco-200 h-4 w-4 sm:h-4 sm:w-4 mt-0.5"
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel className="text-sm font-medium text-neutral-500 cursor-pointer">
+                            <FormLabel className="text-xs sm:text-sm font-medium text-neutral-500 cursor-pointer">
                               Keep me synced
                             </FormLabel>
                           </div>
@@ -307,17 +307,17 @@ export default function AuthPage({ mode = 'login' }) {
                       control={form.control}
                       name="agreeTerms"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormItem className="flex flex-row items-start space-x-2 sm:space-x-3 space-y-0">
                           <FormControl>
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               disabled={isLoading}
-                              className="data-[state=checked]:bg-eco-600 border-eco-200"
+                              className="data-[state=checked]:bg-eco-600 border-eco-200 h-4 w-4 sm:h-4 sm:w-4 mt-0.5"
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel className="text-xs font-medium text-neutral-400 leading-normal">
+                            <FormLabel className="text-[11px] sm:text-xs font-medium text-neutral-400 leading-normal">
                               I agree to the <span className="text-eco-600 underline">Terms of Sustainablity</span> and Environmental Policy.
                             </FormLabel>
                           </div>
@@ -335,13 +335,13 @@ export default function AuthPage({ mode = 'login' }) {
                 <motion.div variants={itemVariants}>
                   <Button
                     type="submit"
-                    className="w-full h-14 text-lg font-bold rounded-xl bg-eco-600 hover:bg-eco-700 shadow-xl shadow-eco-600/20 active:scale-[0.98] transition-all disabled:opacity-80"
+                    className="w-full h-11 sm:h-14 text-sm sm:text-lg font-bold rounded-xl bg-eco-600 hover:bg-eco-700 shadow-xl shadow-eco-600/20 active:scale-[0.98] transition-all disabled:opacity-80"
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
                     ) : (
-                      <ShieldCheck className="mr-2 h-5 w-5" />
+                      <ShieldCheck className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                     )}
                     {isLogin ? 'Sign In to Twin' : 'Launch My Journey'}
                   </Button>

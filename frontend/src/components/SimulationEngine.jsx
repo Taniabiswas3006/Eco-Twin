@@ -80,7 +80,7 @@ export default function SimulationEngine({ userData, currentScore }) {
   // Feature 2: The Eco-Avatar (Tamagotchi concept)
   const renderAvatar = () => {
     return (
-      <div className="relative w-48 h-48 mx-auto flex items-end justify-center">
+      <div className="relative w-28 h-28 sm:w-48 sm:h-48 mx-auto flex items-end justify-center">
         {avatarState === 'thriving' && (
           <motion.div animate={{ scale: [0.95, 1.05, 0.95] }} transition={{ repeat: Infinity, duration: 4 }}>
              <Leaf size={140} className="text-eco-500 drop-shadow-[0_0_20px_rgba(85,141,77,0.8)]" />
@@ -122,10 +122,10 @@ export default function SimulationEngine({ userData, currentScore }) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full min-h-[600px] lg:min-h-[700px] animate-in fade-in duration-500">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 w-full min-h-[500px] lg:min-h-[700px] animate-in fade-in duration-500">
       
       {/* Feature 3: What-If Sandbox (Sliders) */}
-      <div className="lg:col-span-1 space-y-6 bg-white p-6 rounded-2xl border border-neutral-100/50 shadow-sm flex flex-col justify-between">
+      <div className="lg:col-span-1 space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-neutral-100/50 shadow-sm flex flex-col justify-between">
         <div>
           <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-6">Habit Sandbox 🎛️</h3>
           
@@ -166,7 +166,7 @@ export default function SimulationEngine({ userData, currentScore }) {
         </div>
 
         {/* Feature 6: Eco-Wallet Widget */}
-        <div className="mt-6 bg-green-50 rounded-2xl p-5 border border-green-200/60 relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+        <div className="mt-6 bg-green-50 rounded-2xl p-4 sm:p-5 border border-green-200/60 relative overflow-hidden flex flex-col justify-between min-h-[180px] sm:min-h-[220px]">
           <div className="absolute -right-6 -bottom-6 opacity-[0.05] pointer-events-none transition-transform group-hover:scale-110"><Wallet size={140}/></div>
           
           <div className="relative z-10">
@@ -216,10 +216,10 @@ export default function SimulationEngine({ userData, currentScore }) {
       <div className="lg:col-span-2 flex flex-col gap-6">
         
         {/* Time Machine & Avatar Screen */}
-        <div className="flex-1 bg-neutral-50 rounded-2xl p-8 relative overflow-hidden border border-neutral-100/50 flex flex-col justify-between">
+        <div className="flex-1 bg-neutral-50 rounded-2xl p-4 sm:p-8 relative overflow-hidden border border-neutral-100/50 flex flex-col justify-between">
           <div className="z-10 relative flex justify-between items-start">
             <div>
-              <h2 className="text-xl font-bold tracking-tight text-neutral-900">The Ghost of Future Climate ⏳</h2>
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900">The Ghost of Future Climate ⏳</h2>
               <p className="text-neutral-500 text-xs mt-1">Slide into the future to see your impact scale.</p>
             </div>
             
@@ -268,8 +268,8 @@ export default function SimulationEngine({ userData, currentScore }) {
         </div>
 
         {/* Feature 5: Local Impact Comparison */}
-        <div className="grid grid-cols-2 gap-6 h-32">
-          <div className="bg-white rounded-2xl p-6 border border-neutral-100/50 shadow-sm flex items-center gap-4 relative overflow-hidden">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 min-h-[80px] sm:h-32">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 border border-neutral-100/50 shadow-sm flex items-center gap-3 sm:gap-4 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-bl-full" />
             <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center border border-blue-100/50 z-10">
               <MapPin size={24} />
@@ -283,7 +283,7 @@ export default function SimulationEngine({ userData, currentScore }) {
             </div>
           </div>
           
-          <div className="bg-eco-50 rounded-2xl p-6 border border-eco-100 shadow-sm flex items-center justify-between relative overflow-hidden">
+          <div className="bg-eco-50 rounded-2xl p-4 sm:p-6 border border-eco-100 shadow-sm flex items-center justify-between relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-eco-500/10 rounded-full blur-2xl flex items-center justify-center">
                {isSimulating && <Activity className="text-eco-500/30 animate-spin" size={64} />}
             </div>
