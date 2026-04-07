@@ -135,11 +135,11 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
       
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 transition-all">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900 animate-in slide-in-from-left duration-500">
+        <div className="space-y-1">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-neutral-900 animate-in slide-in-from-left duration-500">
             Welcome, <span className="text-eco-600 capitalize">{user?.username || 'Eco User'}</span>
           </h1>
-          <p className="text-neutral-500 mt-1 font-medium italic text-sm sm:text-base">Here is your digital twin dashboard</p>
+          <p className="text-neutral-500 font-medium italic text-sm sm:text-base opacity-80">Here is your digital twin dashboard</p>
         </div>
         <button 
           onClick={onReset}

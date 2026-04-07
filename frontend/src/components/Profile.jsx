@@ -3,11 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Phone, Shield, Edit3, ChevronRight, Settings, Bell, Lock, Check, X, Camera, Loader2 } from 'lucide-react';
 
 export default function Profile({ user: initialUser }) {
-  const [user, setUser] = useState(initialUser || { username: 'Tania', name: 'Tania Biswas', phone: '+91 98765 43210' });
+  const [user, setUser] = useState(() => {
+    const mainUser = initialUser || JSON.parse(localStorage.getItem('user') || '{}');
+    const cachedProfile = JSON.parse(localStorage.getItem(`eco_twin_profile_${mainUser.username}`) || '{}');
+    return { ...mainUser, ...cachedProfile };
+  });
   const [isEditingBasic, setIsEditingBasic] = useState(false);
   const [isEditingPrefs, setIsEditingPrefs] = useState(false);
   const [editedData, setEditedData] = useState({ ...user });
-  const [isLoading, setIsLoading] = useState(!!initialUser?.username);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -15,17 +19,20 @@ export default function Profile({ user: initialUser }) {
         setIsLoading(false);
         return;
       }
-      setIsLoading(true);
+      
+      // If we have cached but partial data, keep loading true
+      // If we have full cached data, we can start with isLoading = false but update in background
+      const cached = localStorage.getItem(`eco_twin_profile_${initialUser.username}`);
+      if (!cached) setIsLoading(true);
+
       try {
         const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-profile?username=${initialUser.username}`);
         if (resp.ok) {
           const data = await resp.json();
-          console.log('DEBUG: Fetched data in Profile:', data);
           const fullUser = { ...initialUser, ...data };
           setUser(fullUser);
           setEditedData(fullUser);
-        } else {
-          console.error("Profile fetch failed:", await resp.text());
+          localStorage.setItem(`eco_twin_profile_${initialUser.username}`, JSON.stringify(data));
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -64,9 +71,9 @@ export default function Profile({ user: initialUser }) {
   };
 
   const profileItems = [
-    { key: 'name', label: 'Full Name', value: user?.name || 'Not provided', icon: <User size={18} /> },
-    { key: 'email', label: 'Email Address', value: user?.email || 'Not provided', icon: <Mail size={18} />, readonly: true },
-    { key: 'phone', label: 'Phone Number', value: user?.phone || 'Not provided', icon: <Phone size={18} /> },
+    { key: 'name', label: 'Full Name', value: user?.name || (isLoading ? 'Loading...' : 'Not provided'), icon: <User size={18} /> },
+    { key: 'email', label: 'Email Address', value: user?.email || (isLoading ? 'Loading...' : 'Not provided'), icon: <Mail size={18} />, readonly: true },
+    { key: 'phone', label: 'Phone Number', value: user?.phone || (isLoading ? 'Loading...' : 'Not provided'), icon: <Phone size={18} /> },
   ];
 
   const settingsItems = [

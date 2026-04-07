@@ -66,18 +66,42 @@ export default function AuthPage({ mode = 'login' }) {
     },
   });
 
+  const [loadingMessage, setLoadingMessage] = useState('');
+
+  // Pre-warm the backend when auth page loads (Render free tier cold start)
+  React.useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL;
+    if (apiUrl && !apiUrl.includes('localhost')) {
+      fetch(`${apiUrl}/`, { method: 'HEAD' }).catch(() => {});
+    }
+  }, []);
+
   const onSubmit = async (data) => {
     setIsLoading(true);
     setError('');
+    setLoadingMessage('Authenticating...');
 
     const url = isLogin ? `${import.meta.env.VITE_API_URL}/login` : `${import.meta.env.VITE_API_URL}/signup`;
+
+    // Show "waking up" message after 5 seconds (cold start indication)
+    const slowTimer = setTimeout(() => {
+      setLoadingMessage('Server is waking up, please wait...');
+    }, 5000);
+
+    // Abort after 45 seconds
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     try {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
+        signal: controller.signal,
       });
+
+      clearTimeout(slowTimer);
+      clearTimeout(timeoutId);
 
       const responseData = await res.json();
 
@@ -95,10 +119,17 @@ export default function AuthPage({ mode = 'login' }) {
         }
       }
     } catch (err) {
+      clearTimeout(slowTimer);
+      clearTimeout(timeoutId);
       console.error(err);
-      setError('Could not connect to the server. Please check your connection.');
+      if (err.name === 'AbortError') {
+        setError('The server took too long to respond. It may have been sleeping — please try again, it should be awake now!');
+      } else {
+        setError('Could not connect to the server. Please check your connection.');
+      }
     } finally {
       setIsLoading(false);
+      setLoadingMessage('');
     }
   };
 
@@ -339,11 +370,16 @@ export default function AuthPage({ mode = 'login' }) {
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                        <span className="text-xs sm:text-sm font-medium">{loadingMessage}</span>
+                      </>
                     ) : (
-                      <ShieldCheck className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                      <>
+                        <ShieldCheck className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                        {isLogin ? 'Sign In to Twin' : 'Launch My Journey'}
+                      </>
                     )}
-                    {isLogin ? 'Sign In to Twin' : 'Launch My Journey'}
                   </Button>
                 </motion.div>
               </form>
