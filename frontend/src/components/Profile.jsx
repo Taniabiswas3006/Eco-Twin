@@ -1,25 +1,31 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Phone, Shield, Edit3, ChevronRight, Settings, Bell, Lock, Check, X, Camera } from 'lucide-react';
+import { User, Mail, Phone, Shield, Edit3, ChevronRight, Settings, Bell, Lock, Check, X, Camera, Loader2 } from 'lucide-react';
 
 export default function Profile({ user: initialUser }) {
   const [user, setUser] = useState(initialUser || { username: 'Tania', name: 'Tania Biswas', phone: '+91 98765 43210' });
   const [isEditingBasic, setIsEditingBasic] = useState(false);
   const [isEditingPrefs, setIsEditingPrefs] = useState(false);
   const [editedData, setEditedData] = useState({ ...user });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!initialUser?.username);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      if (!initialUser?.username) return;
+      if (!initialUser?.username) {
+        setIsLoading(false);
+        return;
+      }
       setIsLoading(true);
       try {
         const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-profile?username=${initialUser.username}`);
         if (resp.ok) {
           const data = await resp.json();
+          console.log('DEBUG: Fetched data in Profile:', data);
           const fullUser = { ...initialUser, ...data };
           setUser(fullUser);
           setEditedData(fullUser);
+        } else {
+          console.error("Profile fetch failed:", await resp.text());
         }
       } catch (err) {
         console.error("Error fetching profile:", err);
@@ -102,14 +108,15 @@ export default function Profile({ user: initialUser }) {
         <section>
           <div className="flex justify-between items-center mb-4 px-1">
             <h3 className="text-xs font-bold text-neutral-400 uppercase tracking-[0.2em]">Basic Information</h3>
-            {!isEditingBasic ? (
+            {!isEditingBasic && !isLoading && (
               <button 
                 onClick={() => setIsEditingBasic(true)}
                 className="text-xs font-bold text-eco-600 hover:text-eco-700 flex items-center gap-1 transition-colors"
               >
                 <Edit3 size={12} /> Edit
               </button>
-            ) : (
+            )}
+            {isEditingBasic && (
               <div className="flex gap-3">
                 <button 
                   onClick={() => setIsEditingBasic(false)}
@@ -129,7 +136,12 @@ export default function Profile({ user: initialUser }) {
           </div>
 
           <div className="bg-white border border-neutral-100 rounded-[24px] overflow-hidden shadow-sm">
-            {profileItems.map((item, idx) => (
+            {isLoading ? (
+               <div className="p-10 flex flex-col items-center justify-center space-y-4 opacity-40">
+                  <Loader2 className="animate-spin text-eco-500" size={32} />
+                  <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Retrieving Secure Profile...</p>
+               </div>
+            ) : profileItems.map((item, idx) => (
               <div key={idx} className={`flex items-center justify-between p-5 transition-colors ${idx !== profileItems.length - 1 ? 'border-b border-neutral-50' : ''}`}>
                 <div className="flex items-center gap-4 flex-1">
                   <div className="w-10 h-10 rounded-xl bg-neutral-50 flex items-center justify-center text-neutral-500 border border-neutral-100/50 text-sm">

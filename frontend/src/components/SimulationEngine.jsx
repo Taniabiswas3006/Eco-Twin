@@ -250,8 +250,8 @@ export default function SimulationEngine({ userData, currentScore }) {
             </AnimatePresence>
           </div>
 
-          <div className="z-10 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md p-5 rounded-xl border border-neutral-100 shadow-sm">
-            <div className="flex justify-between text-[10px] font-bold text-neutral-400 mb-3 uppercase tracking-widest">
+          <div className="z-10 bg-white/90 backdrop-blur-md p-6 rounded-2xl border border-neutral-200/50 shadow-xl shadow-eco-900/5 transition-all">
+            <div className="flex justify-between text-[10px] font-extrabold text-neutral-400 mb-4 uppercase tracking-[0.2em]">
               <span>Present (2026)</span>
               <span>Time Travel (2050)</span>
             </div>
@@ -259,9 +259,9 @@ export default function SimulationEngine({ userData, currentScore }) {
               type="range" min="2026" max="2050" step="1" 
               value={targetYear} 
               onChange={(e) => setTargetYear(Number(e.target.value))} 
-              className="w-full"
+              className="w-full accent-eco-600 cursor-pointer h-2 bg-neutral-200 rounded-lg appearance-none"
             />
-            <div className="text-center mt-3 font-bold text-eco-600 text-xl tracking-tighter">
+            <div className="text-center mt-4 font-extrabold text-eco-600 text-2xl tracking-tighter">
               Year: <span className="text-neutral-900">{targetYear}</span>
             </div>
           </div>

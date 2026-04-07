@@ -82,7 +82,11 @@ export default function AuthPage({ mode = 'login' }) {
       const responseData = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('user', JSON.stringify({ username: responseData.username, token: responseData.token }));
+        localStorage.setItem('user', JSON.stringify({ 
+          username: responseData.username, 
+          email: responseData.email || '',
+          token: responseData.token 
+        }));
         navigate('/app');
       } else {
         setError(responseData.error || 'Authentication failed. Please try again.');

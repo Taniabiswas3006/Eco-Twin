@@ -384,12 +384,19 @@ def login():
         # Use '?' for SQLite, '%s' for PostgreSQL
         placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
         
-        c.execute(f"SELECT password FROM users WHERE username = {placeholder} AND email = {placeholder}", (username, email))
+        c.execute(f"SELECT password, email FROM users WHERE username = {placeholder} AND email = {placeholder}", (username, email))
         row = c.fetchone()
         conn.close()
         
         if row and check_password_hash(row[0], password):
-            return jsonify({"message": "Login successful", "username": username, "token": "dummy-jwt-token"}), 200
+            # Check row indexing (Postgres uses tuple, sqlite Row or tuple)
+            db_email = row['email'] if hasattr(row, 'keys') else row[1]
+            return jsonify({
+                "message": "Login successful", 
+                "username": username, 
+                "email": db_email,
+                "token": "dummy-jwt-token"
+            }), 200
         else:
             return jsonify({"error": "Invalid username, email or password"}), 401
     except Exception as e:
@@ -412,6 +419,7 @@ def get_profile():
         conn.close()
         
         if row:
+            print(f"DEBUG: Profile data for {username}: {row}")
             # Handle both SQLite (Row) and PostgreSQL (Tuple)
             if hasattr(row, 'keys'): # SQLite
                 return jsonify({
