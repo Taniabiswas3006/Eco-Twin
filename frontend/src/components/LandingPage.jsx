@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Leaf, Zap, Trash2, ChevronRight, Activity, TrendingUp, TrendingDown, Settings } from 'lucide-react';
+import { Feature108 } from './Feature108';
 
 export default function LandingPage() {
   return (
@@ -186,7 +187,7 @@ export default function LandingPage() {
       </div>
 
       {/* Bottom Features Row */}
-      <div className="w-full max-w-5xl px-8 pb-16 z-20 relative">
+      <div className="w-full max-w-5xl px-8 pb-4 z-20 relative">
         <motion.div 
            initial={{ opacity: 0, y: 30 }}
            animate={{ opacity: 1, y: 0 }}
@@ -243,130 +244,9 @@ export default function LandingPage() {
         </motion.div>
       </div>
 
-      {/* --- PRO DESIGNER FEATURES SECTION --- */}
-      <section id="features" className="w-full bg-[#f4fcf4] text-neutral-800 py-32 px-8 flex flex-col items-center relative z-30 shadow-[0_-20px_50px_rgba(0,0,0,0.02)]">
-        
-        {/* Decorative background glows - subtle for light theme */}
-        <div className="absolute top-0 right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#5c9853] blur-[150px] opacity-[0.03] pointer-events-none" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#c7e0cb] blur-[150px] opacity-[0.03] pointer-events-none" />
-        
-        {/* Section Silhouette */}
-        <div className="absolute -bottom-20 right-[-5%] w-72 h-72 opacity-[0.04] pointer-events-none transform -rotate-12">
-           <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full text-[#5c9853]">
-              <path fill="currentColor" d="M42.7,-73.6C54.7,-67.2,63.3,-53.4,70.6,-39.7C77.9,-26,83.9,-13,83.8,-0.1C83.7,12.8,77.5,25.6,69.8,37.5C62.1,49.4,52.9,60.4,40.8,66.8C28.7,73.2,14.4,75.1,1.2,73C-12,70.9,-24.1,64.8,-36.1,58.3C-48.1,51.8,-60,45,-66.6,33.9C-73.2,22.8,-74.5,7.4,-72.1,-7C-69.7,-21.4,-63.6,-34.8,-54.6,-45.5C-45.6,-56.2,-33.7,-64.2,-21.1,-70C-8.5,-75.8,4.8,-79.4,18.1,-78.3C31.4,-77.2,42.7,-73.6,42.7,-73.6Z" transform="translate(100 100)" />
-           </svg>
-        </div>
-
-        <div className="w-full max-w-6xl relative z-10">
-           {/* Section Header */}
-           <motion.div 
-             initial={{ opacity: 0, y: 30 }}
-             whileInView={{ opacity: 1, y: 0 }}
-             viewport={{ once: true, margin: "-100px" }}
-             transition={{ duration: 0.8 }}
-             className="max-w-3xl mb-24"
-           >
-              <h2 className="text-[#5c9853] font-bold tracking-widest uppercase text-xs mb-4 flex items-center gap-2">
-                 <div className="w-6 h-[2px] bg-[#5c9853]"></div> Core Architecture
-              </h2>
-              <h3 className="text-4xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6 text-neutral-900">
-                 Intelligence meets sustainability.
-              </h3>
-              <p className="text-lg text-neutral-500 font-medium max-w-2xl">
-                 We don't just calculate your emissions. We construct a dynamic mirrored model of your lifestyle that adapts, learns, and simulates a better future.
-              </p>
-           </motion.div>
-
-           {/* Asymmetrical Layout Blocks */}
-           <div className="flex flex-col gap-32">
-              
-              {/* Feature 1 */}
-              <div className="flex flex-col lg:flex-row items-center gap-16">
-                 <motion.div 
-                   initial={{ opacity: 0, scale: 0.95 }}
-                   whileInView={{ opacity: 1, scale: 1 }}
-                   viewport={{ once: true, margin: "-100px" }}
-                   transition={{ duration: 0.8 }}
-                   className="flex-1 w-full bg-white p-8 rounded-[2.5rem] border border-neutral-100 relative shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] overflow-hidden"
-                 >
-                    <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-[#5c9853] blur-[80px] opacity-[0.07]" />
-                    <div className="relative z-10 flex flex-col gap-4">
-                       <div className="w-full h-48 bg-neutral-50 rounded-2xl border border-neutral-100 p-6 flex flex-col justify-end relative shadow-inner">
-                           <div className="text-[10px] text-neutral-400 absolute top-4 left-4 uppercase tracking-wider font-bold">Carbon Synapse v.04</div>
-                           <div className="flex items-end gap-3 h-24 w-full mb-2">
-                              <div className="w-1/6 bg-neutral-200 rounded-t-lg h-[40%]"></div>
-                              <div className="w-1/6 bg-neutral-200 rounded-t-lg h-[60%]"></div>
-                              <div className="w-1/6 bg-[#5c9853] rounded-t-lg h-[85%] relative shadow-[0_0_20px_rgba(92,152,83,0.2)]"></div>
-                              <div className="w-1/6 bg-neutral-200 rounded-t-lg h-[30%]"></div>
-                              <div className="w-1/6 bg-neutral-200 rounded-t-lg h-[50%]"></div>
-                              <div className="w-1/6 bg-neutral-200 rounded-t-lg h-[70%]"></div>
-                           </div>
-                       </div>
-                       <div className="flex gap-4">
-                           <div className="w-1/2 h-16 bg-neutral-50 rounded-2xl border border-neutral-100 flex items-center px-4 gap-3">
-                              <div className="w-3 h-3 rounded-full bg-neutral-300"></div>
-                              <div className="h-1.5 w-1/2 bg-neutral-200 rounded-full"></div>
-                           </div>
-                           <div className="w-1/2 h-16 bg-[#e3f0e5] rounded-2xl border border-[#5c9853]/10 flex items-center px-4 gap-3">
-                              <div className="w-3 h-3 rounded-full bg-[#5c9853]"></div>
-                              <div className="h-1.5 w-3/4 bg-[#5c9853]/30 rounded-full"></div>
-                           </div>
-                       </div>
-                    </div>
-                 </motion.div>
-
-                 <div className="flex-1 w-full flex flex-col justify-center">
-                    <div className="w-14 h-14 bg-white border border-neutral-100 rounded-2xl flex items-center justify-center text-[#5c9853] mb-8 shadow-sm">
-                       <Activity size={24} />
-                    </div>
-                    <h4 className="text-3xl font-bold mb-5 text-neutral-900">Deep Behavioral Mapping</h4>
-                    <p className="text-neutral-500 leading-relaxed text-lg font-medium">
-                       By understanding the nuanced choices in your daily routine—from your transit patterns to your energy grid—we map your specific carbon signature with surgical precision, unlocking insights you never knew existed.
-                    </p>
-                 </div>
-              </div>
-
-              {/* Feature 2: Reversed */}
-              <div className="flex flex-col-reverse lg:flex-row items-center gap-16">
-                 <div className="flex-1 w-full flex flex-col justify-center">
-                    <div className="w-14 h-14 bg-white border border-neutral-100 rounded-2xl flex items-center justify-center text-orange-500 mb-8 shadow-sm">
-                       <Zap size={24} />
-                    </div>
-                    <h4 className="text-3xl font-bold mb-5 text-neutral-900">What-If Simulations</h4>
-                    <p className="text-neutral-500 leading-relaxed text-lg font-medium">
-                       Wondering how switching to a plant-based diet impacts your footprint? Our powerful simulation engine instantly calculates "what-if" scenarios, enabling you to visualize the monumental impact of micro-decisions before making a change.
-                    </p>
-                 </div>
-
-                 <motion.div 
-                   initial={{ opacity: 0, scale: 0.95 }}
-                   whileInView={{ opacity: 1, scale: 1 }}
-                   viewport={{ once: true, margin: "-100px" }}
-                   transition={{ duration: 0.8 }}
-                   className="flex-1 w-full bg-[#f9fdf9] py-14 px-8 rounded-[2.5rem] border border-[#e3f0e5] relative shadow-[0_20px_50px_-15px_rgba(0,0,0,0.03)] overflow-hidden"
-                 >
-                    <div className="flex flex-col gap-5 relative z-10 w-4/5 mx-auto">
-                        <div className="w-full bg-white p-5 rounded-2xl border border-neutral-100 flex items-center gap-4 shadow-sm transition-transform hover:-translate-y-1">
-                           <div className="w-4 h-4 rounded-full border-2 border-neutral-200"></div>
-                           <div className="h-2 w-3/4 bg-neutral-100 rounded-full"></div>
-                        </div>
-                        <div className="w-full bg-white p-5 rounded-2xl border border-[#c7e0cb]/50 flex items-center gap-4 transform -translate-x-6 shadow-xl transition-transform hover:-translate-y-2 hover:-translate-x-6">
-                           <div className="w-5 h-5 rounded-full bg-[#5c9853] flex items-center justify-center shadow-lg shadow-[#5c9853]/20">
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                           </div>
-                           <div className="h-2 w-full bg-[#e3f0e5] rounded-full"></div>
-                        </div>
-                        <div className="w-full bg-white p-5 rounded-2xl border border-neutral-100 flex items-center gap-4 shadow-sm transition-transform hover:-translate-y-1">
-                           <div className="w-4 h-4 rounded-full border-2 border-neutral-200"></div>
-                           <div className="h-2 w-1/2 bg-neutral-100 rounded-full"></div>
-                        </div>
-                    </div>
-                 </motion.div>
-              </div>
-
-           </div>
-        </div>
-      </section>
+      <div id="features">
+        <Feature108 />
+      </div>
 
       {/* --- PROFESSIONAL FOOTER --- */}
       <footer className="w-full bg-white py-20 px-8 border-t border-neutral-100 relative z-40">

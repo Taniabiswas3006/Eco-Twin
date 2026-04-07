@@ -1,234 +1,353 @@
+import * as React from "react";
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, ArrowRight, ArrowLeft, Phone, BadgeInfo } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { motion } from "framer-motion";
+import { useNavigate, Link } from 'react-router-dom';
+import { Leaf, Loader2, ArrowLeft, ShieldCheck, User, Phone, Info } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
+import authBg from '@/assets/ecotwin_auth.png';
+
+const loginSchema = z.object({
+  username: z.string().min(3, { message: "Username must be at least 3 characters." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  rememberMe: z.boolean().default(false).optional(),
+});
+
+const signupSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  username: z.string().min(3, { message: "Username must be at least 3 characters." }),
+  phone: z.string().regex(/^\d{10}$/, { message: "Phone number must be exactly 10 digits." }),
+  gender: z.enum(["female", "male", "non-binary", "prefer-not-to-say"], {
+    required_error: "Please select your gender."
+  }),
+  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  agreeTerms: z.boolean().refine(val => val === true, { message: "You must agree to the terms." }),
+});
 
 export default function AuthPage({ mode = 'login' }) {
   const isLogin = mode === 'login';
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ 
-    username: '', password: '', name: '', phone: '', gender: '' 
-  });
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const getPasswordStrength = (pass) => {
-    if (!pass) return 0;
-    let strength = 0;
-    if (pass.length >= 5) strength += 1;
-    if (pass.length >= 8) strength += 1;
-    if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) strength += 1;
-    if (/[0-9]/.test(pass) && /[^A-Za-z0-9]/.test(pass)) strength += 1;
-    return Math.max(1, Math.min(4, strength));
-  };
-  const pwStrength = getPasswordStrength(formData.password);
-  const strengthColors = ['', 'bg-red-400', 'bg-orange-400', 'bg-eco-400', 'bg-eco-600'];
-  const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  const formSchema = isLogin ? loginSchema : signupSchema;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!isLogin && formData.phone && formData.phone.length !== 10) {
-      setError('Please enter exactly 10 digits for the phone number.');
-      return;
-    }
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: isLogin ? {
+      username: "",
+      password: "",
+      rememberMe: false,
+    } : {
+      name: "",
+      username: "",
+      phone: "",
+      gender: "",
+      password: "",
+      agreeTerms: false,
+    },
+  });
 
+  const onSubmit = async (data) => {
     setIsLoading(true);
     setError('');
 
     const url = isLogin ? `${import.meta.env.VITE_API_URL}/login` : `${import.meta.env.VITE_API_URL}/signup`;
-    
+
     try {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(data)
       });
-      
-      const data = await res.json();
-      
+
+      const responseData = await res.json();
+
       if (res.ok) {
-        // Success
-        localStorage.setItem('user', JSON.stringify({ username: data.username, token: data.token }));
+        localStorage.setItem('user', JSON.stringify({ username: responseData.username, token: responseData.token }));
         navigate('/app');
       } else {
-        setError(data.error || 'Something went wrong');
+        setError(responseData.error || 'Authentication failed. Please try again.');
+        if (responseData.error?.toLowerCase().includes("username")) {
+          form.setError("username", { message: responseData.error });
+        }
       }
     } catch (err) {
       console.error(err);
-      setError('Could not connect to the server.');
+      setError('Could not connect to the server. Please check your connection.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
   return (
-    <div className="w-full max-w-md mx-auto mt-16">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="glass-card p-6 sm:p-10 pt-16 sm:pt-16 flex flex-col relative"
-      >
-        <button 
-          onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 flex items-center gap-2 text-neutral-400 hover:text-neutral-800 transition-colors text-sm font-medium bg-neutral-100/50 hover:bg-neutral-200 px-3 py-1.5 rounded-full"
-        >
-          <ArrowLeft size={16} /> Back
-        </button>
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold tracking-tight mb-2">
-            {isLogin ? 'Welcome Back' : 'Join EcoTwin'}
-          </h2>
-          <p className="text-neutral-500 text-sm">
-            {isLogin ? 'Log in to continue building your twin.' : 'Create an account to track your lifestyle.'}
-          </p>
-        </div>
+    <div className="relative flex min-h-screen w-full flex-col md:flex-row bg-white">
+      {/* Left Panel: Form */}
+      <div className="flex w-full flex-col items-center justify-center p-8 md:w-1/2 lg:p-16">
+        <div className="w-full max-w-lg">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col gap-8"
+          >
+            {/* Nav Back Meta */}
+            <motion.div variants={itemVariants} className="flex items-center justify-between">
+              <Link to="/" className="flex items-center gap-2 text-eco-600 font-bold text-xl tracking-tight">
+                <Leaf className="fill-eco-500" />
+                <span>EcoTwin</span>
+              </Link>
+              <Button variant="ghost" size="sm" asChild className="text-neutral-500 font-medium">
+                <Link to="/">
+                  Back to Home
+                </Link>
+              </Button>
+            </motion.div>
 
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-300">
-            <div className="w-12 h-12 border-4 border-eco-100 border-t-eco-600 rounded-full animate-spin mb-4" />
-            <p className="text-neutral-500 font-medium text-sm animate-pulse">Syncing with EcoTwin...</p>
-          </div>
-        ) : (
-          <>
+            <motion.div variants={itemVariants} className="text-left space-y-2">
+              <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900">
+                {isLogin ? 'Welcome Back' : 'Create Your Twin'}
+              </h1>
+              <p className="text-neutral-500 text-lg font-medium">
+                {isLogin
+                  ? 'Access your digital sustainability reflection.'
+                  : 'Join thousands modeling a more sustainable future.'}
+              </p>
+            </motion.div>
+
             {error && (
-              <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm font-medium border border-red-100">
+              <motion.div
+                variants={itemVariants}
+                className="p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-sm font-semibold flex items-start gap-3 shadow-sm"
+              >
+                <div className="mt-0.5"><Info size={16} /></div>
                 {error}
-              </div>
+              </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {!isLogin && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5 ml-1">Full Name</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <BadgeInfo size={18} />
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-5"
+              >
+                {!isLogin && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <motion.div variants={itemVariants}>
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Jane Doe" {...field} disabled={isLoading} className="rounded-xl h-12" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </motion.div>
+                    <motion.div variants={itemVariants}>
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="10-digit number" {...field} disabled={isLoading} className="rounded-xl h-12" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </motion.div>
                   </div>
-                  <input 
-                    type="text" 
-                    required={!isLogin}
-                    value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
-                    className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-eco-500/50 focus:border-eco-500 transition-all placeholder:text-neutral-400"
-                    placeholder="Jane Doe"
-                  />
-                </div>
-              </div>
+                )}
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5 ml-1">Phone Number</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                    <Phone size={18} />
-                  </div>
-                  <input 
-                    type="tel" 
-                    required={!isLogin}
-                    value={formData.phone}
-                    onChange={e => {
-                      const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
-                      setFormData({...formData, phone: digits});
-                    }}
-                    className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-eco-500/50 focus:border-eco-500 transition-all placeholder:text-neutral-400"
-                    placeholder="10-digit number"
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input placeholder="eco_warrior" {...field} disabled={isLoading} className="rounded-xl h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-              </div>
+                </motion.div>
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-1.5 ml-1">Gender</label>
-                <select 
-                  required={!isLogin}
-                  value={formData.gender}
-                  onChange={e => setFormData({...formData, gender: e.target.value})}
-                  className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-eco-500/50 focus:border-eco-500 transition-all text-neutral-700"
+                {!isLogin && (
+                  <motion.div variants={itemVariants}>
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gender</FormLabel>
+                          <select
+                            {...field}
+                            disabled={isLoading}
+                            className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-eco-500/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <option value="" disabled>Select gender</option>
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                          </select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </motion.div>
+                )}
+
+                <motion.div variants={itemVariants}>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} disabled={isLoading} className="rounded-xl h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </motion.div>
+
+                <motion.div
+                  variants={itemVariants}
+                  className="flex items-center justify-between"
                 >
-                  <option value="" disabled>Select gender</option>
-                  <option value="female">Female</option>
-                  <option value="male">Male</option>
-                  <option value="non-binary">Non-binary</option>
-                  <option value="prefer-not-to-say">Prefer not to say</option>
-                </select>
-              </div>
-            </>
-          )}
+                  {isLogin ? (
+                    <FormField
+                      control={form.control}
+                      name="rememberMe"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={isLoading}
+                              className="data-[state=checked]:bg-eco-600 border-eco-200"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-sm font-medium text-neutral-500 cursor-pointer">
+                              Keep me synced
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <FormField
+                      control={form.control}
+                      name="agreeTerms"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={isLoading}
+                              className="data-[state=checked]:bg-eco-600 border-eco-200"
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="text-xs font-medium text-neutral-400 leading-normal">
+                              I agree to the <span className="text-eco-600 underline">Terms of Sustainablity</span> and Environmental Policy.
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {isLogin && (
+                    <a href="#" className="text-sm font-bold text-eco-600 hover:underline">
+                      Forgotten?
+                    </a>
+                  )}
+                </motion.div>
 
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1.5 ml-1">Username</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                <User size={18} />
-              </div>
-              <input 
-                type="text" 
-                required
-                value={formData.username}
-                onChange={e => setFormData({...formData, username: e.target.value})}
-                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-eco-500/50 focus:border-eco-500 transition-all placeholder:text-neutral-400"
-                placeholder="Enter your username"
-              />
-            </div>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-neutral-700 mb-1.5 ml-1">Password</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                <Lock size={18} />
-              </div>
-              <input 
-                type="password" 
-                required
-                value={formData.password}
-                onChange={e => setFormData({...formData, password: e.target.value})}
-                className="w-full pl-10 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-eco-500/50 focus:border-eco-500 transition-all placeholder:text-neutral-400"
-                placeholder="••••••••"
-              />
-            </div>
-            {!isLogin && formData.password && (
-              <div className="mt-3 px-1">
-                <div className="flex gap-1.5 mb-1.5">
-                  {[1, 2, 3, 4].map(idx => (
-                    <div key={idx} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${pwStrength >= idx ? strengthColors[pwStrength] : 'bg-neutral-200'}`} />
-                  ))}
-                </div>
-                <div className={`text-xs text-right font-medium transition-colors ${pwStrength <= 2 ? 'text-orange-500' : 'text-eco-600'}`}>
-                  {strengthLabels[pwStrength]}
-                </div>
-              </div>
-            )}
-          </div>
+                <motion.div variants={itemVariants}>
+                  <Button
+                    type="submit"
+                    className="w-full h-14 text-lg font-bold rounded-xl bg-eco-600 hover:bg-eco-700 shadow-xl shadow-eco-600/20 active:scale-[0.98] transition-all disabled:opacity-80"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    ) : (
+                      <ShieldCheck className="mr-2 h-5 w-5" />
+                    )}
+                    {isLogin ? 'Sign In to Twin' : 'Launch My Journey'}
+                  </Button>
+                </motion.div>
+              </form>
+            </Form>
 
-          <button 
-            type="submit"
-            disabled={isLoading}
-            className="mt-4 bg-eco-600 hover:bg-eco-700 text-white py-3.5 rounded-xl font-medium flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-70 shadow-md shadow-eco-600/20"
-          >
-            {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : isLogin ? (
-              <>Sign In <ArrowRight size={18} /></>
-            ) : (
-              <>Create Account <ArrowRight size={18} /></>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center text-sm text-neutral-500">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <Link 
-            to={isLogin ? '/signup' : '/login'} 
-            className="font-medium text-eco-600 hover:text-eco-800 transition-colors"
-          >
-            {isLogin ? 'Sign up' : 'Log in'}
-          </Link>
+            <motion.p
+              variants={itemVariants}
+              className="text-center text-sm text-neutral-500 font-medium"
+            >
+              {isLogin ? "Don't have an account yet? " : "Already modeling your life? "}
+              <Link
+                to={isLogin ? '/signup' : '/login'}
+                className="font-bold text-eco-600 hover:text-eco-800 transition-colors"
+              >
+                {isLogin ? 'Start here' : 'Sign in here'}
+              </Link>
+            </motion.p>
+          </motion.div>
         </div>
-        </>
-        )}
-      </motion.div>
+      </div>
+
+      <div className="relative hidden w-1/2 md:block overflow-hidden bg-white">
+        <img
+          src={authBg}
+          alt="EcoTwin Sustainability"
+          className="h-full w-full object-cover opacity-100 transition-opacity duration-700"
+        />
+      </div>
     </div>
   );
 }

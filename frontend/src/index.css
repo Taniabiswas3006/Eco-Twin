@@ -40,6 +40,16 @@ body {
   --color-neutral-800: #343a40;
   --color-neutral-900: #212529;
 
+  --color-primary: var(--color-eco-500);
+  --color-primary-foreground: #ffffff;
+  --color-muted: var(--color-eco-100);
+  --color-muted-foreground: #6b7280;
+  --color-accent: var(--color-eco-200);
+  --color-accent-foreground: var(--color-eco-900);
+  --color-border: var(--color-neutral-200);
+  --color-input: var(--color-neutral-200);
+  --color-ring: var(--color-eco-500);
+
   --font-sans: "Inter", system-ui, sans-serif;
 
   --shadow-apple: 0 4px 24px rgba(0,0,0,0.06);

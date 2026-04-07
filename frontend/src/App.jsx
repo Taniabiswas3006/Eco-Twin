@@ -57,11 +57,11 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/login" element={<AuthPage mode="login" />} />
+          <Route path="/signup" element={<AuthPage mode="signup" />} />
           <Route path="/*" element={
             <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-center p-6 relative">
               <Routes>
-                <Route path="/login" element={<AuthPage mode="login" />} />
-                <Route path="/signup" element={<AuthPage mode="signup" />} />
                 <Route path="/app" element={<DigitalTwin />} />
               </Routes>
             </div>
