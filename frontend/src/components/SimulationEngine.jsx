@@ -44,7 +44,7 @@ export default function SimulationEngine({ userData, currentScore }) {
 
   const scoreToUse = result?.new_score || currentScore;
   const isHealthy = scoreToUse > 60;
-  
+
   // Calculate lifetime accumulated carbon based on target year
   const yearsDiff = targetYear - 2026;
   const yearlyCarbon = (result?.new_metrics?.carbon_footprint || 300) * 12;
@@ -66,7 +66,7 @@ export default function SimulationEngine({ userData, currentScore }) {
 
   // Extract state logic to sync with labels and badges
   let avatarState = 'thriving';
-  
+
   // Custom sandbox logic strictly overrides default thriving:
   if (simulatedData.electricity > 5 || simulatedData.ac > 2 || simulatedData.shopping > 1) {
     avatarState = 'struggling';
@@ -83,18 +83,18 @@ export default function SimulationEngine({ userData, currentScore }) {
       <div className="relative w-28 h-28 sm:w-48 sm:h-48 mx-auto flex items-end justify-center">
         {avatarState === 'thriving' && (
           <motion.div animate={{ scale: [0.95, 1.05, 0.95] }} transition={{ repeat: Infinity, duration: 4 }}>
-             <Leaf size={140} className="text-eco-500 drop-shadow-[0_0_20px_rgba(85,141,77,0.8)]" />
+            <Leaf size={140} className="text-eco-500 drop-shadow-[0_0_20px_rgba(85,141,77,0.8)]" />
           </motion.div>
         )}
         {avatarState === 'struggling' && (
           <motion.div animate={{ rotate: [-2, 2, -2] }} transition={{ repeat: Infinity, duration: 3 }}>
-             <Leaf size={120} className="text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.4)]" />
-             <Wind size={40} className="absolute -top-4 right-0 text-neutral-400 animate-pulse" />
+            <Leaf size={120} className="text-yellow-500 drop-shadow-[0_0_15px_rgba(234,179,8,0.4)]" />
+            <Wind size={40} className="absolute -top-4 right-0 text-neutral-400 animate-pulse" />
           </motion.div>
         )}
         {avatarState === 'dying' && (
           <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ repeat: Infinity, duration: 2 }}>
-             <Flame size={120} className="text-red-500 drop-shadow-[0_0_25px_rgba(239,68,68,0.8)]" />
+            <Flame size={120} className="text-red-500 drop-shadow-[0_0_25px_rgba(239,68,68,0.8)]" />
           </motion.div>
         )}
       </div>
@@ -105,7 +105,7 @@ export default function SimulationEngine({ userData, currentScore }) {
   const renderBalloons = () => {
     // Only show if traveling in time and accumulating footprint
     if (yearsDiff === 0 || scoreToUse > 80) return null;
-    const count = Math.min(50, Math.floor(accumulatedCarbon / 12000)); 
+    const count = Math.min(50, Math.floor(accumulatedCarbon / 12000));
     return (
       <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl z-0 opacity-40">
         {Array.from({ length: count }).map((_, i) => (
@@ -123,26 +123,26 @@ export default function SimulationEngine({ userData, currentScore }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 w-full min-h-[500px] lg:min-h-[700px] animate-in fade-in duration-500">
-      
+
       {/* Feature 3: What-If Sandbox (Sliders) */}
       <div className="lg:col-span-1 space-y-4 sm:space-y-6 bg-white p-4 sm:p-6 rounded-2xl border border-neutral-100/50 shadow-sm flex flex-col justify-between">
         <div>
-          <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-6">Habit Sandbox 🎛️</h3>
-          
+          <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-6">Habit Sandbox</h3>
+
           <div className="space-y-6">
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Zap size={14}/> Electricity Use</span> <span className="text-eco-600">{simulatedData.electricity} hrs</span></div>
-              <input type="range" min="0" max="24" value={simulatedData.electricity} onChange={(e) => setSimulatedData({...simulatedData, electricity: Number(e.target.value)})} />
+              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Zap size={14} /> Electricity Use</span> <span className="text-eco-600">{simulatedData.electricity} hrs</span></div>
+              <input type="range" min="0" max="24" value={simulatedData.electricity} onChange={(e) => setSimulatedData({ ...simulatedData, electricity: Number(e.target.value) })} />
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Snowflake size={14}/> AC Usage</span> <span className="text-eco-600">{simulatedData.ac} hrs</span></div>
-              <input type="range" min="0" max="24" value={simulatedData.ac} onChange={(e) => setSimulatedData({...simulatedData, ac: Number(e.target.value)})} />
+              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Snowflake size={14} /> AC Usage</span> <span className="text-eco-600">{simulatedData.ac} hrs</span></div>
+              <input type="range" min="0" max="24" value={simulatedData.ac} onChange={(e) => setSimulatedData({ ...simulatedData, ac: Number(e.target.value) })} />
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><ShoppingBag size={14}/> Shopping</span> <span className="text-eco-600">{simulatedData.shopping}x/wk</span></div>
-              <input type="range" min="0" max="10" value={simulatedData.shopping} onChange={(e) => setSimulatedData({...simulatedData, shopping: Number(e.target.value)})} />
+              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><ShoppingBag size={14} /> Shopping</span> <span className="text-eco-600">{simulatedData.shopping}x/wk</span></div>
+              <input type="range" min="0" max="10" value={simulatedData.shopping} onChange={(e) => setSimulatedData({ ...simulatedData, shopping: Number(e.target.value) })} />
             </div>
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function SimulationEngine({ userData, currentScore }) {
         <div className="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-neutral-100">
           <div>
             <span className="text-[10px] font-bold text-neutral-400 uppercase">Travel Mode</span>
-            <select value={simulatedData.travel} onChange={(e) => setSimulatedData({...simulatedData, travel: e.target.value})} className="w-full mt-1 bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-2 text-xs outline-none focus:border-eco-500 font-semibold text-neutral-700">
+            <select value={simulatedData.travel} onChange={(e) => setSimulatedData({ ...simulatedData, travel: e.target.value })} className="w-full mt-1 bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-2 text-xs outline-none focus:border-eco-500 font-semibold text-neutral-700">
               <option value="car">Car (High)</option>
               <option value="public">Transit</option>
               <option value="bike">Bike (Low)</option>
@@ -158,7 +158,7 @@ export default function SimulationEngine({ userData, currentScore }) {
           </div>
           <div>
             <span className="text-[10px] font-bold text-neutral-400 uppercase">Diet Type</span>
-            <select value={simulatedData.food} onChange={(e) => setSimulatedData({...simulatedData, food: e.target.value})} className="w-full mt-1 bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-2 text-xs outline-none focus:border-eco-500 font-semibold text-neutral-700">
+            <select value={simulatedData.food} onChange={(e) => setSimulatedData({ ...simulatedData, food: e.target.value })} className="w-full mt-1 bg-neutral-50 border border-neutral-200 rounded-lg px-2 py-2 text-xs outline-none focus:border-eco-500 font-semibold text-neutral-700">
               <option value="non-veg">Meat (High)</option>
               <option value="veg">Plant (Low)</option>
             </select>
@@ -167,11 +167,11 @@ export default function SimulationEngine({ userData, currentScore }) {
 
         {/* Feature 6: Eco-Wallet Widget */}
         <div className="mt-6 bg-green-50 rounded-2xl p-4 sm:p-5 border border-green-200/60 relative overflow-hidden flex flex-col justify-between min-h-[180px] sm:min-h-[220px]">
-          <div className="absolute -right-6 -bottom-6 opacity-[0.05] pointer-events-none transition-transform group-hover:scale-110"><Wallet size={140}/></div>
-          
+          <div className="absolute -right-6 -bottom-6 opacity-[0.05] pointer-events-none transition-transform group-hover:scale-110"><Wallet size={140} /></div>
+
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-3">
-              <div className="bg-green-100 p-2 rounded-lg text-green-600 shadow-sm"><Wallet size={18}/></div>
+              <div className="bg-green-100 p-2 rounded-lg text-green-600 shadow-sm"><Wallet size={18} /></div>
               <p className="text-xs font-bold text-green-700 uppercase tracking-widest leading-none">Eco-Wallet</p>
             </div>
             <p className="text-[12px] text-green-800/70 leading-relaxed font-medium">Monthly savings from these habit adjustments:</p>
@@ -193,19 +193,19 @@ export default function SimulationEngine({ userData, currentScore }) {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-2 relative z-10">
               {projectedSavings < 0 ? (
                 <div className="inline-flex items-center px-2 py-0.5 bg-red-100/50 rounded-md border border-red-200/50">
-                   <span className="text-[9px] font-bold text-red-500 uppercase tracking-wide">Increased Cost</span>
+                  <span className="text-[9px] font-bold text-red-500 uppercase tracking-wide">Increased Cost</span>
                 </div>
               ) : projectedSavings > 0 ? (
                 <div className="inline-flex items-center px-2 py-0.5 bg-green-100/50 rounded-md border border-green-200/50">
-                   <span className="text-[9px] font-bold text-green-600 uppercase tracking-wide">Savings Achieved</span>
+                  <span className="text-[9px] font-bold text-green-600 uppercase tracking-wide">Savings Achieved</span>
                 </div>
               ) : (
                 <div className="inline-flex items-center px-2 py-0.5 bg-neutral-100 rounded-md">
-                   <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-wide">No Change</span>
+                  <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-wide">No Change</span>
                 </div>
               )}
             </div>
@@ -214,15 +214,15 @@ export default function SimulationEngine({ userData, currentScore }) {
       </div>
 
       <div className="lg:col-span-2 flex flex-col gap-6">
-        
+
         {/* Time Machine & Avatar Screen */}
         <div className="flex-1 bg-neutral-50 rounded-2xl p-4 sm:p-8 relative overflow-hidden border border-neutral-100/50 flex flex-col justify-between">
           <div className="z-10 relative flex justify-between items-start">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900">The Ghost of Future Climate ⏳</h2>
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900">The Ghost of Future Climate</h2>
               <p className="text-neutral-500 text-xs mt-1">Slide into the future to see your impact scale.</p>
             </div>
-            
+
             <div className="text-right">
               <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Eco-Avatar</p>
               <p className={`text-sm font-bold mt-0.5 ${avatarState === 'dying' ? 'text-red-500' : avatarState === 'struggling' ? 'text-yellow-600' : 'text-eco-600'}`}>
@@ -235,11 +235,11 @@ export default function SimulationEngine({ userData, currentScore }) {
 
           <div className="z-10 relative my-8">
             {renderAvatar()}
-            
+
             <AnimatePresence>
               {yearsDiff > 0 && (
-                <motion.div 
-                  initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -10}}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
                   className="text-center mt-6"
                 >
                   <span className={`${avatarState === 'dying' ? 'bg-red-500' : avatarState === 'struggling' ? 'bg-yellow-500' : 'bg-eco-500'} text-white text-xs font-bold px-4 py-2 rounded-full drop-shadow-md transition-colors`}>
@@ -255,10 +255,10 @@ export default function SimulationEngine({ userData, currentScore }) {
               <span>Present (2026)</span>
               <span>Time Travel (2050)</span>
             </div>
-            <input 
-              type="range" min="2026" max="2050" step="1" 
-              value={targetYear} 
-              onChange={(e) => setTargetYear(Number(e.target.value))} 
+            <input
+              type="range" min="2026" max="2050" step="1"
+              value={targetYear}
+              onChange={(e) => setTargetYear(Number(e.target.value))}
               className="w-full accent-eco-600 cursor-pointer h-2 bg-neutral-200 rounded-lg appearance-none"
             />
             <div className="text-center mt-4 font-extrabold text-eco-600 text-2xl tracking-tighter">
@@ -282,10 +282,10 @@ export default function SimulationEngine({ userData, currentScore }) {
               <p className="text-[11px] text-neutral-500 font-medium">in your region 📍</p>
             </div>
           </div>
-          
+
           <div className="bg-eco-50 rounded-2xl p-4 sm:p-6 border border-eco-100 shadow-sm flex items-center justify-between relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-eco-500/10 rounded-full blur-2xl flex items-center justify-center">
-               {isSimulating && <Activity className="text-eco-500/30 animate-spin" size={64} />}
+              {isSimulating && <Activity className="text-eco-500/30 animate-spin" size={64} />}
             </div>
             <div className="z-10">
               <p className="text-[10px] font-bold text-eco-700 uppercase tracking-widest">Simulated Twin Score</p>
