@@ -8,6 +8,8 @@ import Sidebar from './Sidebar';
 import Profile from './Profile';
 import Settings from './Settings';
 
+import CarbonCalculator from './CarbonCalculator';
+
 export default function DigitalTwin() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
@@ -98,7 +100,7 @@ export default function DigitalTwin() {
     navigate('/');
   };
 
-  const showSidebar = !!prediction || activeTab === 'profile' || activeTab === 'settings';
+  const showSidebar = !!prediction || activeTab === 'profile' || activeTab === 'settings' || activeTab === 'footprint';
 
   if (!showSidebar) {
     return (
@@ -151,6 +153,16 @@ export default function DigitalTwin() {
                 prediction={prediction} 
                 onReset={resetJourney} 
               />
+            </motion.div>
+          ) : activeTab === 'footprint' ? (
+            <motion.div
+              key="footprint-view"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="w-full"
+            >
+              <CarbonCalculator user={user} />
             </motion.div>
           ) : activeTab === 'profile' ? (
             <motion.div

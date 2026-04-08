@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, User, Settings, LogOut, Leaf, Menu, X } from 'lucide-react';
+import { LayoutDashboard, User, Settings, LogOut, Leaf, Menu, X, Calculator } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, onLogout, user }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +21,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, user }) {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+    { id: 'footprint', label: 'Carbon Footprint', icon: <Calculator size={20} /> },
     { id: 'profile', label: 'My Profile', icon: <User size={20} /> },
     { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
   ];
