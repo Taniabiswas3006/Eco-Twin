@@ -1,5 +1,6 @@
 import React, { useState, createContext, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import dashboardImg from '../assets/dashboard.png';
 import {
    Leaf, Menu, X, ChevronRight, Settings, TrendingDown,
    Activity, Zap, Trash2, Database, Cpu, Globe, ArrowRight
@@ -480,7 +481,7 @@ export default function LandingPage() {
                   <div className="absolute -inset-8 bg-eco-500/10 rounded-[4rem] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   <div className="relative rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
                      <img
-                        src="\src\assets\dashboard.png"
+                        src={dashboardImg}
                         alt="EcoTwin Dashboard Preview"
                         className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
                      />
