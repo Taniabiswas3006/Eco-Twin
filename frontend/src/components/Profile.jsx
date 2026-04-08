@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, Mail, Phone, Shield, Edit3, ChevronRight, Settings, 
   Bell, Lock, Check, X, Camera, Loader2, Leaf, 
-  Trophy, Zap, Car, Wind, Target, TrendingDown, ArrowRight, ExternalLink, LogOut
+  Trophy, Zap, Car, Wind, Target, TrendingDown, ArrowRight, ExternalLink
 } from 'lucide-react';
 
 export default function Profile({ user: initialUser }) {
