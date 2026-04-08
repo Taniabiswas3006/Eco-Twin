@@ -570,7 +570,7 @@ export default function AuthPage({ mode = 'login' }) {
                 left: '70px',
                 width: '180px',
                 height: (isTyping || (passwordValue.length > 0 && !showPassword)) ? '440px' : '400px',
-                backgroundColor: '#6C3FF5',
+                backgroundColor: '#558d4d',
                 borderRadius: '10px 10px 0 0',
                 zIndex: 1,
                 transform: (passwordValue.length > 0 && showPassword)
@@ -579,7 +579,7 @@ export default function AuthPage({ mode = 'login' }) {
                     ? `skewX(${(purplePos.bodySkew || 0) - 12}deg) translateX(40px)` 
                     : `skewX(${purplePos.bodySkew || 0}deg)`,
                 transformOrigin: 'bottom center',
-                boxShadow: '0 -20px 40px -20px rgba(108, 63, 245, 0.3)'
+                boxShadow: '0 -20px 40px -20px rgba(85, 141, 77, 0.3)'
               }}
             >
               <div 
@@ -608,7 +608,7 @@ export default function AuthPage({ mode = 'login' }) {
                 left: '240px',
                 width: '120px',
                 height: '310px',
-                backgroundColor: '#2D2D2D',
+                backgroundColor: '#243a22',
                 borderRadius: '8px 8px 0 0',
                 zIndex: 2,
                 transform: (passwordValue.length > 0 && showPassword)
@@ -648,7 +648,7 @@ export default function AuthPage({ mode = 'login' }) {
                 width: '240px',
                 height: '200px',
                 zIndex: 3,
-                backgroundColor: '#FF9B6B',
+                backgroundColor: '#75ab6b',
                 borderRadius: '120px 120px 0 0',
                 transform: (passwordValue.length > 0 && showPassword) ? `skewX(0deg)` : `skewX(${orangePos.bodySkew || 0}deg)`,
                 transformOrigin: 'bottom center',
@@ -674,7 +674,7 @@ export default function AuthPage({ mode = 'login' }) {
                 left: '310px',
                 width: '140px',
                 height: '230px',
-                backgroundColor: '#E8D754',
+                backgroundColor: '#9bca1b',
                 borderRadius: '70px 70px 0 0',
                 zIndex: 4,
                 transform: (passwordValue.length > 0 && showPassword) ? `skewX(0deg)` : `skewX(${yellowPos.bodySkew || 0}deg)`,
