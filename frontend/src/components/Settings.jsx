@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell, Lock, Globe, User, Palette, Phone, Shield, 
-  ArrowRight, Check, Moon, Sun, Database, Mail, 
+  ArrowRight, Check, Database, Mail, 
   CreditCard, Key, Cloud, Eye, HelpCircle, LogOut 
 } from 'lucide-react';
 
 export default function Settings() {
-  const [theme, setTheme] = useState('light');
   const [language, setLanguage] = useState('English');
   const [notifications, setNotifications] = useState({
     push: true,
@@ -27,14 +26,6 @@ export default function Settings() {
         const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-settings?username=${username}`);
         if (resp.ok) {
           const settings = await resp.json();
-          if (settings.theme) {
-            setTheme(settings.theme);
-            if (settings.theme === 'dark') {
-              document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
-            }
-          }
           if (settings.language) setLanguage(settings.language);
         }
       } catch (err) {
@@ -44,18 +35,11 @@ export default function Settings() {
     fetchSettings();
   }, []);
 
-  const handleSave = async (newTheme, newLang) => {
+  const handleSave = async (newLang) => {
     setIsLoading(true);
     const storedUser = localStorage.getItem('user');
     if (!storedUser) return;
     
-    const isDark = newTheme === 'dark';
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else if (newTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-    }
-
     const { username } = JSON.parse(storedUser);
     try {
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/update-settings`, {
@@ -64,7 +48,6 @@ export default function Settings() {
         body: JSON.stringify({
           username,
           settings: { 
-            theme: newTheme || theme, 
             language: newLang || language 
           }
         })
@@ -79,12 +62,6 @@ export default function Settings() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    handleSave(newTheme, language);
   };
 
   return (
@@ -115,31 +92,6 @@ export default function Settings() {
         <section>
           <SectionHeader title="Appearance & Interface" />
           <div className="bg-white rounded-[2.5rem] border border-neutral-100 overflow-hidden shadow-sm">
-            {/* THEME TOGGLE (PRESERVED) */}
-            <div className="flex items-center justify-between p-7 border-b border-neutral-50 group">
-              <div className="flex items-center gap-5">
-                <div className="w-11 h-11 rounded-2xl bg-neutral-50 flex items-center justify-center text-neutral-400 border border-neutral-100/50 group-hover:scale-110 transition-transform">
-                  {theme === 'light' ? <Sun size={20} /> : <Moon size={20} />}
-                </div>
-                <div>
-                  <p className="text-sm font-black text-neutral-900 uppercase tracking-widest leading-none mb-1">Interface Theme</p>
-                  <p className="text-[11px] text-neutral-400 font-bold uppercase tracking-wider">Switch between light/dark mode</p>
-                </div>
-              </div>
-              <button 
-                onClick={toggleTheme}
-                className={`relative w-14 h-7 rounded-full transition-all duration-500 shadow-inner overflow-hidden ${theme === 'dark' ? 'bg-eco-600 shadow-eco-900/20' : 'bg-neutral-200'}`}
-              >
-                <motion.div 
-                  animate={{ x: theme === 'dark' ? 28 : 4 }}
-                  className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-lg flex items-center justify-center z-10"
-                >
-                   {theme === 'dark' ? <Moon size={10} className="text-eco-600" /> : <Sun size={10} className="text-neutral-400" />}
-                </motion.div>
-                <div className={`absolute inset-0 transition-opacity duration-1000 ${theme === 'dark' ? 'opacity-100' : 'opacity-0'} bg-gradient-to-r from-eco-700 to-eco-500`} />
-              </button>
-            </div>
-
             {/* Language Selector */}
             <SettingItem 
               icon={<Globe size={20} />} 
@@ -148,7 +100,7 @@ export default function Settings() {
               action={
                 <select 
                   value={language}
-                  onChange={(e) => {setLanguage(e.target.value); handleSave(theme, e.target.value);}}
+                  onChange={(e) => {setLanguage(e.target.value); handleSave(e.target.value);}}
                   className="bg-neutral-50 border border-neutral-100 rounded-xl px-4 py-2 text-[10px] font-black text-neutral-900 outline-none focus:ring-2 focus:ring-eco-500/20 uppercase tracking-widest appearance-none cursor-pointer"
                 >
                   <option value="English">English</option>
@@ -208,7 +160,7 @@ export default function Settings() {
               title="Export Nodes" 
               subtitle="Download lifestyle CSV" 
              />
-             <div className="p-7 flex items-center justify-between group cursor-pointer text-red-500 hover:bg-red-50 transition-colors">
+             <div className="p-7 flex items-center justify-between group cursor-pointer text-red-500 hover:bg-red-50 transition-colors" onClick={() => {localStorage.removeItem('user'); window.location.href='/';}}>
                 <div className="flex items-center gap-5">
                    <div className="w-11 h-11 rounded-2xl bg-red-50 flex items-center justify-center border border-red-100/50">
                       <LogOut size={20} />

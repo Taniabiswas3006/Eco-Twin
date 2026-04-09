@@ -241,7 +241,7 @@ export default function LandingPage() {
          </AnimatePresence>
 
          {/* Main Hero Container */}
-         <div className="w-full max-w-7xl px-4 sm:px-8 pt-4 sm:pt-6 pb-12 sm:pb-24 flex flex-col lg:flex-row items-center justify-between z-10 gap-8 sm:gap-12 flex-1">
+         <div className="w-full max-w-7xl px-4 sm:px-8 pt-4 sm:pt-6 pb-4 sm:pb-12 flex flex-col lg:flex-row items-center justify-between z-10 gap-8 sm:gap-12 flex-1">
 
             {/* Left Side: Copy */}
             <div className="flex-1 max-w-2xl z-20 text-center lg:text-left">
@@ -399,7 +399,7 @@ export default function LandingPage() {
          </div>
 
          {/* INTERACTIVE IMPACT SIMULATOR - MINI DEMO */}
-         <div id="simulator" className="w-full max-w-7xl px-4 sm:px-8 py-20 sm:py-32 z-10">
+         <div id="simulator" className="w-full max-w-7xl px-4 sm:px-8 py-10 sm:py-20 z-10">
             <SimulatorContext.Provider value={{ choices, setChoices }}>
                <div className="bg-white rounded-[3rem] p-10 sm:p-20 border border-neutral-100 shadow-apple relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-eco-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -470,8 +470,8 @@ export default function LandingPage() {
          </div>
 
          {/* DASHBOARD PREVIEW - THE "PRODUCT" FEEL */}
-         <div className="w-full max-w-7xl px-4 sm:px-8 py-20 sm:py-32 z-10 border-t border-neutral-50">
-            <div className="grid lg:grid-cols-2 gap-24 items-center">
+         <div className="w-full max-w-7xl px-4 sm:px-8 pt-10 sm:pt-16 pb-20 sm:pb-32 z-10 border-t border-neutral-50">
+            <div className="grid lg:grid-cols-2 gap-12 sm:gap-24 items-center">
                <motion.div
                   initial={{ opacity: 0, x: -40 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -479,7 +479,7 @@ export default function LandingPage() {
                   className="relative group"
                >
                   <div className="absolute -inset-8 bg-eco-500/10 rounded-[4rem] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  <div className="relative rounded-[3rem] overflow-hidden border-8 border-white shadow-2xl">
+                  <div className="relative rounded-[1.5rem] sm:rounded-[3rem] overflow-hidden border-4 sm:border-8 border-white shadow-2xl">
                      <img
                         src={dashboardImg}
                         alt="EcoTwin Dashboard Preview"
@@ -490,7 +490,7 @@ export default function LandingPage() {
                   <motion.div
                      animate={{ y: [0, -15, 0] }}
                      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                     className="absolute -top-10 -right-6 bg-white p-6 rounded-[2rem] shadow-2xl border border-neutral-50 flex items-center gap-4 z-20"
+                     className="absolute -top-4 -right-2 sm:-top-10 sm:-right-6 bg-white p-3 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl border border-neutral-50 flex items-center gap-3 sm:gap-4 z-20 scale-[0.65] sm:scale-100 origin-right"
                   >
                      <div className="w-14 h-14 rounded-2xl bg-eco-50 flex items-center justify-center text-eco-600 border border-eco-100">
                         <TrendingDown size={28} font-black />
@@ -502,7 +502,7 @@ export default function LandingPage() {
                   </motion.div>
                </motion.div>
 
-               <div className="space-y-12">
+               <div className="space-y-6">
                   <Badge className="bg-eco-50 text-eco-600 border-eco-100 font-black">Mission Control</Badge>
                   <h2 className="text-4xl sm:text-6xl font-black text-neutral-900 leading-[1.1] tracking-tighter">Your sustainability, <br /><span className="text-eco-600 underline decoration-eco-200 decoration-8 underline-offset-8">managed.</span></h2>
 

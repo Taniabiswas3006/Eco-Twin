@@ -7,46 +7,6 @@ import BlogPage from './components/BlogPage';
 import HowItWorks from './components/HowItWorks';
 
 function App() {
-  useEffect(() => {
-    // Feature: Auto-redirect to landing on refresh
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('/app')) {
-      window.location.replace('/');
-    }
-
-    // Global theme initialization
-    const initializeTheme = async () => {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        try {
-          const { username } = JSON.parse(storedUser);
-          const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-settings?username=${username}`);
-          if (resp.ok) {
-            const settings = await resp.json();
-            const isDark = settings.theme === 'dark';
-            
-            // Update class
-            if (isDark) {
-              document.documentElement.classList.add('dark');
-            } else {
-              document.documentElement.classList.remove('dark');
-            }
-            
-            // Update browser theme color meta tag
-            let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-            if (!metaThemeColor) {
-              metaThemeColor = document.createElement('meta');
-              metaThemeColor.setAttribute('name', 'theme-color');
-              document.head.appendChild(metaThemeColor);
-            }
-            metaThemeColor.setAttribute('content', isDark ? '#0a0a0a' : '#f9fafb');
-          }
-        } catch (err) {
-          console.error("Theme init error:", err);
-        }
-      }
-    };
-    initializeTheme();
-  }, []);
   return (
     <div className="flex flex-col relative min-h-screen">
       {/* Soft background blobs */}

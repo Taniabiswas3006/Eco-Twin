@@ -21,21 +21,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 
 const loginSchema = z.object({
-  username: z.string().min(3, { message: "Username must be at least 3 characters." }),
+  username: z.string().min(2, { message: "Username must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  password: z.string().min(4, { message: "Password must be at least 4 characters." }),
   rememberMe: z.boolean().default(false).optional(),
 });
 
 const signupSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  username: z.string().min(3, { message: "Username must be at least 3 characters." }),
+  name: z.string().min(1, { message: "Name is required." }),
+  username: z.string().min(2, { message: "Username must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   phone: z.string().regex(/^\d{10}$/, { message: "Phone number must be exactly 10 digits." }),
   gender: z.enum(["female", "male", "non-binary", "prefer-not-to-say"], { 
     required_error: "Please select your gender." 
   }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  password: z.string().min(4, { message: "Password must be at least 4 characters." }),
   agreeTerms: z.boolean().refine(val => val === true, { message: "You must agree to the terms." }),
 });
 
