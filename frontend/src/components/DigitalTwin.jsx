@@ -6,9 +6,16 @@ import InputForm from './InputForm';
 import Dashboard from './Dashboard';
 import Sidebar from './Sidebar';
 import Profile from './Profile';
-import Settings from './Settings';
-
+import Bounties from './Bounties';
 import CarbonCalculator from './CarbonCalculator';
+
+const DEFAULT_BOUNTIES = [
+  { id: 1, title: 'Meatless Weekend', deadline: '2 days left', points: 50, progress: 0, status: 'active' },
+  { id: 2, title: 'Transit Pioneer', deadline: '5 days left', points: 120, progress: 40, status: 'active' },
+  { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
+  { id: 4, title: 'Solar Synchronizer', deadline: 'Daily (10am-2pm)', points: 100, progress: 0, status: 'pending' },
+  { id: 5, title: 'Eco-Commuter', deadline: '3 days streak', points: 150, progress: 0, status: 'pending' },
+];
 
 export default function DigitalTwin() {
   const navigate = useNavigate();
@@ -19,6 +26,11 @@ export default function DigitalTwin() {
   const [user, setUser] = useState(null);
   const [hasPrevious, setHasPrevious] = useState(false);
 
+  const [level, setLevel] = useState(1);
+  const [xp, setXp] = useState(0);
+  const [bounties, setBounties] = useState([]);
+  const [loadingBounties, setLoadingBounties] = useState(true);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -27,8 +39,74 @@ export default function DigitalTwin() {
       if (localStorage.getItem(`eco_twin_prev_${parsedUser.username}`)) {
         setHasPrevious(true);
       }
+      fetchBounties(parsedUser);
     }
   }, []);
+
+  const fetchBounties = async (currentUser) => {
+    if (!currentUser) return;
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/get-bounties?username=${currentUser.username}`);
+      if (res.ok) {
+        const data = await res.json();
+        setXp(data.xp || 0);
+        setLevel(data.level || 1);
+        if (data.bounties && Array.isArray(data.bounties) && data.bounties.length > 0) {
+          setBounties(data.bounties);
+        } else {
+          setBounties(DEFAULT_BOUNTIES);
+        }
+      } else {
+        setBounties(DEFAULT_BOUNTIES);
+      }
+    } catch (err) { 
+      setBounties(DEFAULT_BOUNTIES);
+    } finally { 
+      setLoadingBounties(false); 
+    }
+  };
+
+  const handleBountyClick = (id) => {
+    let updatedXp = xp;
+    let updatedLevel = level;
+    
+    const updatedBounties = bounties.map(b => {
+      if (b.id !== id) return b;
+      if (b.status === 'pending') return { ...b, status: 'active' };
+      if (b.status === 'active') {
+        const newProgress = b.progress + 20; 
+        if (newProgress >= 100) {
+          updatedXp += b.points;
+          if (updatedXp >= updatedLevel * 500) updatedLevel += 1;
+          return { ...b, progress: 100, status: 'completed' };
+        }
+        return { ...b, progress: newProgress };
+      }
+      return b;
+    });
+
+    setBounties(updatedBounties);
+    setXp(updatedXp);
+    setLevel(updatedLevel);
+    saveBounties(updatedBounties, updatedXp, updatedLevel);
+  };
+
+  const saveBounties = async (newBounties, newXp, newLevel) => {
+    const currentUser = user || JSON.parse(localStorage.getItem('user'));
+    if (!currentUser) return;
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/update-bounties`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: currentUser.username,
+          bounties: newBounties,
+          xp: newXp,
+          level: newLevel
+        })
+      });
+    } catch (err) { console.error(err); }
+  };
 
   const handleLoadPrevious = () => {
     if (user && user.username) {
@@ -100,7 +178,7 @@ export default function DigitalTwin() {
     navigate('/');
   };
 
-  const showSidebar = !!prediction || activeTab === 'profile' || activeTab === 'settings' || activeTab === 'footprint';
+  const showSidebar = !!prediction || activeTab === 'profile' || activeTab === 'bounties' || activeTab === 'footprint';
 
   if (!showSidebar) {
     return (
@@ -151,7 +229,13 @@ export default function DigitalTwin() {
                 user={user}
                 userData={userData} 
                 prediction={prediction} 
-                onReset={resetJourney} 
+                onReset={resetJourney}
+                xp={xp}
+                level={level}
+                bounties={bounties}
+                loadingBounties={loadingBounties}
+                onBountyClick={handleBountyClick}
+                onViewBounties={() => setActiveTab('bounties')}
               />
             </motion.div>
           ) : activeTab === 'footprint' ? (
@@ -176,13 +260,19 @@ export default function DigitalTwin() {
             </motion.div>
           ) : (
             <motion.div
-              key="settings-view"
+              key="bounties-view"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className="w-full"
             >
-              <Settings />
+              <Bounties 
+                user={user} 
+                bounties={bounties}
+                xp={xp}
+                level={level}
+                handleBountyClick={handleBountyClick}
+              />
             </motion.div>
           )}
         </AnimatePresence>

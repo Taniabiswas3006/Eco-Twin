@@ -61,19 +61,19 @@ const LiveOutput = () => {
    // Sources: EPA, EEA, and IPCC standard emission factors.
    const calculateScore = () => {
       let score = 0;
-      
+
       // 1. Commute Weight (40%): Bike (40 pts), Car (0 pts)
       // Car avg: 121g/km. 20km avg commute = 2.42kg CO2.
       if (choices.commute === 'Bike') score += 40;
-      
+
       // 2. Diet Weight (30%): Veg (30 pts), Meat (0 pts)
       // High-meat diet: 7.2kg CO2e/day. Veg diet: 3.3kg CO2e/day. (Oxford study)
       if (choices.diet === 'Veg') score += 30;
-      
+
       // 3. Energy Weight (30%): Smart Home (30 pts), Full Usage (10 pts)
       // Smart optimization typically reduces home energy consumption by ~15-20%.
       if (choices.energy === 'Smart') score += 30; else score += 10;
-      
+
       return score;
    };
 
@@ -85,7 +85,7 @@ const LiveOutput = () => {
       if (choices.diet === 'Veg') dailySavings += 3.9;
       // Saving 15% of avg 30kWh household (4.5kWh) converted to CO2 (avg 0.4kg/kWh) = 1.8kg
       if (choices.energy === 'Smart') dailySavings += 1.8;
-      
+
       return dailySavings.toFixed(1);
    };
 
@@ -106,12 +106,12 @@ const LiveOutput = () => {
             animate={{ scale: 1, opacity: 1 }}
             className="relative w-40 h-40 sm:w-52 sm:h-52 flex items-center justify-center"
          >
-            <svg className="absolute inset-0 w-full h-full p-2">
-               <circle cx="50%" cy="50%" r="48%" stroke="#e5e5e5" strokeWidth="8" fill="none" />
+            <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full">
+               <circle cx="50" cy="50" r="44" stroke="#e5e5e5" strokeWidth="5" fill="none" />
                <motion.circle
-                  cx="50%" cy="50%" r="48%"
+                  cx="50" cy="50" r="44"
                   stroke={score > 80 ? '#5c9853' : score > 50 ? '#f59e0b' : '#ef4444'}
-                  strokeWidth="8" fill="none"
+                  strokeWidth="5" fill="none"
                   strokeDasharray="100 100"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: score / 100 }}
@@ -251,8 +251,8 @@ export default function LandingPage() {
                   transition={{ duration: 0.6 }}
                   className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-neutral-800 leading-[1.1] mb-4 sm:mb-6"
                >
-                  Model Your Life.<br />
-                  <span className="text-[#5c9853]">Reduce Your Impact.</span>
+                  Model Your Life<br />
+                  <span className="text-[#5c9853]">Reduce Your Impact</span>
                </motion.h1>
 
                <motion.p
@@ -316,12 +316,12 @@ export default function LandingPage() {
                      </div>
 
                      <div className="relative w-44 h-44 flex items-center justify-center rounded-full bg-white shadow-[inset_0_4px_10px_rgba(0,0,0,0.05)] border-[8px] border-[#f4f9f4]">
-                        <svg className="absolute inset-0 w-full h-full transform -rotate-90">
+                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full transform -rotate-90">
                            <motion.circle
                               initial={{ pathLength: 0 }}
                               animate={{ pathLength: 0.82 }}
                               transition={{ duration: 1.5, delay: 0.8 }}
-                              cx="50%" cy="50%" r="42%" stroke="#5c9853" strokeWidth="10" fill="none" strokeDasharray="100 100" strokeLinecap="round"
+                              cx="50" cy="50" r="44" stroke="#5c9853" strokeWidth="5" fill="none" strokeDasharray="100 100" strokeLinecap="round"
                            />
                         </svg>
                         <div className="text-center z-10 flex flex-col items-center justify-center pt-2">

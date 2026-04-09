@@ -1,151 +1,56 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCcw, Leaf, Zap, Trash2, ArrowUpRight, CheckCircle2, Target, Clock, Trophy, Loader2 } from 'lucide-react';
+import { RefreshCcw, Leaf, Zap, Trash2, ArrowUpRight, CheckCircle2, Target, Clock, Trophy, Loader2, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 import SimulationEngine from './SimulationEngine';
 
-const DEFAULT_BOUNTIES = [
-  { id: 1, title: 'Meatless Weekend', deadline: '2 days left', points: 50, progress: 0, status: 'active' },
-  { id: 2, title: 'Transit Pioneer', deadline: '5 days left', points: 120, progress: 40, status: 'active' },
-  { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
-];
-
-export default function Dashboard({ user, userData, prediction, onReset }) {
+export default function Dashboard({ 
+  user, userData, prediction, onReset, 
+  xp, level, bounties, loadingBounties, onBountyClick, onViewBounties 
+}) {
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Interactive Gamification State
-  const [level, setLevel] = useState(1);
-  const [xp, setXp] = useState(0);
-  const [bounties, setBounties] = useState([]);
-  const [loadingBounties, setLoadingBounties] = useState(true);
+  if (!prediction) return null;
 
-  // Sync with backend
-  useEffect(() => {
-    const fetchBounties = async () => {
-      // Use the user prop if available, otherwise fallback to localStorage
-      const currentUser = user || JSON.parse(localStorage.getItem('user'));
-      if (!currentUser) return;
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/get-bounties?username=${currentUser.username}`);
-        if (res.ok) {
-          const data = await res.json();
-          setXp(data.xp || 0);
-          setLevel(data.level || 1);
-          
-          // Ensure we always have data to show
-          if (data.bounties && Array.isArray(data.bounties) && data.bounties.length > 0) {
-            setBounties(data.bounties);
-          } else {
-            setBounties(DEFAULT_BOUNTIES);
-          }
-        } else {
-          // Fallback if user doesn't exist yet in the bounty table
-          setBounties(DEFAULT_BOUNTIES);
-        }
-      } catch (err) { 
-        console.error(err); 
-        setBounties(DEFAULT_BOUNTIES);
-      }
-      finally { setLoadingBounties(false); }
-    };
-    fetchBounties();
-  }, [user]); // Add user as dependency
-
-  const saveBounties = async (newBounties, newXp, newLevel) => {
-    const currentUser = user || JSON.parse(localStorage.getItem('user'));
-    if (!currentUser) return;
-    try {
-      await fetch(`${import.meta.env.VITE_API_URL}/update-bounties`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: currentUser.username,
-          bounties: newBounties,
-          xp: newXp,
-          level: newLevel
-        })
-      });
-    } catch (err) { console.error(err); }
-  };
-
-  const handleBountyClick = (id) => {
-    let updatedXp = xp;
-    let updatedLevel = level;
-    
-    const updatedBounties = bounties.map(b => {
-      if (b.id !== id) return b;
-      
-      if (b.status === 'pending') {
-        return { ...b, status: 'active' };
-      }
-      
-      if (b.status === 'active') {
-        const newProgress = b.progress + 20; 
-        if (newProgress >= 100) {
-          updatedXp += b.points;
-          // Level up logic every 500 XP
-          if (updatedXp >= updatedLevel * 500) {
-            updatedLevel += 1;
-          }
-          return { ...b, progress: 100, status: 'completed' };
-        }
-        return { ...b, progress: newProgress };
-      }
-      return b;
-    });
-
-    setBounties(updatedBounties);
-    setXp(updatedXp);
-    setLevel(updatedLevel);
-    saveBounties(updatedBounties, updatedXp, updatedLevel);
-  };
-
-  const {
-    carbon_footprint,
-    energy_consumption,
-    waste_generation,
-    sustainability_score,
-    category,
-    insights
-  } = prediction;
+  const { carbon_footprint, energy_consumption, waste_generation, sustainability_score, insights } = prediction;
 
   const chartData = [
-    { name: 'Carbon', value: carbon_footprint, fill: '#ef4444' },
-    { name: 'Energy', value: energy_consumption, fill: '#eab308' },
-    { name: 'Waste', value: waste_generation * 10, fill: '#3b82f6' }, // Scaled for visibility
+    { name: 'Carbon', value: carbon_footprint, fill: '#5c9853' },
+    { name: 'Energy', value: energy_consumption, fill: '#3B82F6' },
+    { name: 'Waste', value: waste_generation, fill: '#F59E0B' }
   ];
 
   const getScoreColor = (score) => {
-    if (score >= 75) return 'text-eco-500';
-    if (score >= 40) return 'text-yellow-500';
+    if (score > 75) return 'text-eco-600';
+    if (score > 40) return 'text-amber-500';
     return 'text-red-500';
   };
 
   const getMetricIcon = (type) => {
-    switch(type) {
-      case 'carbon': return <Leaf size={20} className="text-red-500" />;
-      case 'energy': return <Zap size={20} className="text-yellow-500" />;
-      case 'waste': return <Trash2 size={20} className="text-blue-500" />;
+    switch (type) {
+      case 'carbon': return <Leaf size={16} />;
+      case 'energy': return <Zap size={16} />;
+      case 'waste': return <Trash2 size={16} />;
       default: return null;
     }
   };
 
   return (
-    <div className="w-full max-w-[90rem] mx-auto space-y-6">
+    <div className="space-y-6 sm:space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 sm:gap-0 transition-all">
-        <div className="space-y-1">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-neutral-900 animate-in slide-in-from-left duration-500">
-            Welcome, <span className="text-eco-600 capitalize">{user?.username || 'Eco User'}</span>
-          </h1>
-          <p className="text-neutral-500 font-medium italic text-sm sm:text-base opacity-80">Here is your digital twin dashboard</p>
+      {/* Top Header Section */}
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 tracking-tight">
+            Welcome, <span className="text-eco-600">{user?.username || 'Eco Enthusiast'}!</span>
+          </h2>
+          <p className="text-neutral-500 text-sm font-medium">Here is your personalized eco-dashboard</p>
         </div>
         <button 
           onClick={onReset}
-          className="flex items-center gap-2 text-sm font-medium text-neutral-500 hover:text-neutral-900 transition-colors"
+          className="p-2 sm:px-4 sm:py-2 bg-neutral-900 text-white rounded-xl text-sm font-bold hover:bg-neutral-800 transition-all flex items-center gap-2"
         >
-          <RefreshCcw size={16} /> Recalculate
+          <RefreshCcw size={16} /> <span className="hidden sm:inline">Reset</span>
         </button>
       </div>
 
@@ -157,20 +62,20 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
           
           <span className="text-neutral-500 font-medium mb-2 uppercase tracking-wider text-sm">Sustainability Score</span>
           <div className="relative">
-            <svg className="w-48 h-48 transform -rotate-90">
+            <svg viewBox="0 0 200 200" className="w-48 h-48 transform -rotate-90">
               <circle
-                cx="96" cy="96" r="88"
-                stroke="currentColor" strokeWidth="8" fill="transparent"
+                cx="100" cy="100" r="90"
+                stroke="currentColor" strokeWidth="10" fill="transparent"
                 className="text-neutral-100"
               />
               <motion.circle
-                initial={{ strokeDashoffset: 553 }}
-                animate={{ strokeDashoffset: 553 - (553 * sustainability_score) / 100 }}
+                initial={{ strokeDashoffset: 565 }}
+                animate={{ strokeDashoffset: 565 - (565 * sustainability_score) / 100 }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                cx="96" cy="96" r="88"
-                stroke="currentColor" strokeWidth="8" fill="transparent"
-                strokeDasharray="553"
-                className={`${getScoreColor(sustainability_score)} drop-shadow-md`}
+                cx="100" cy="100" r="90"
+                stroke="currentColor" strokeWidth="10" fill="transparent"
+                strokeDasharray="565"
+                className={`${getScoreColor(sustainability_score)}`}
                 strokeLinecap="round"
               />
             </svg>
@@ -178,28 +83,28 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
               <span className={`text-5xl font-bold tracking-tighter ${getScoreColor(sustainability_score)}`}>
                 {sustainability_score}
               </span>
-              <span className="text-sm font-medium text-neutral-500 mt-1">/ 100</span>
             </div>
           </div>
+          <div className="mt-6 text-sm font-bold uppercase tracking-widest text-neutral-400">Index Rating</div>
           
-          <div className="mt-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-neutral-100 text-neutral-700 font-medium text-sm">
-            {category === 'Eco-conscious' && <CheckCircle2 size={16} className="text-eco-500" />}
-            {category} Status
+          <div className="mt-6 flex items-center gap-2 px-3 py-1 bg-neutral-50 rounded-full border border-neutral-100">
+            <div className={`w-2 h-2 rounded-full ${getScoreColor(sustainability_score)}`} />
+            <span className="text-xs font-bold text-neutral-600 uppercase tracking-widest">{prediction.category}</span>
           </div>
         </div>
 
-        {/* Metrics & Chart */}
-        <div className="lg:col-span-2 glass-card p-4 sm:p-8 flex flex-col">
-          <div className="flex gap-3 sm:gap-4 mb-4 sm:mb-6 border-b border-neutral-100 pb-4 overflow-x-auto">
+        {/* Analytics Card */}
+        <div className="lg:col-span-2 glass-card p-5 sm:p-8 flex flex-col">
+          <div className="flex gap-8 mb-6 border-b border-neutral-100 flex-nowrap overflow-x-auto scrollbar-hide">
             <button 
               onClick={() => setActiveTab('overview')}
-              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'overview' ? 'border-neutral-900 text-neutral-900 dark:border-white' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
+              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'overview' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
             >
               Overview
             </button>
             <button 
               onClick={() => setActiveTab('simulation')}
-              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'simulation' ? 'border-neutral-900 text-neutral-900 dark:border-white' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
+              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'simulation' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
             >
               Simulation Engine
             </button>
@@ -233,7 +138,6 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
                       <div className="text-xl sm:text-2xl font-bold">{waste_generation}<span className="text-xs sm:text-sm text-neutral-400 font-normal ml-1">kg</span></div>
                     </div>
                   </div>
-
 
                   <div className="w-full h-[250px] sm:h-[280px]">
                     <h3 className="text-xs sm:text-sm font-medium text-neutral-500 mb-3 sm:mb-4 uppercase tracking-wider">Impact Breakdown</h3>
@@ -288,7 +192,7 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
 
         {/* Gamified Missions Section */}
         <div className="glass-card p-5 sm:p-8 flex flex-col bg-gradient-to-br from-white to-blue-50/30">
-          <div className="flex justify-between items-center mb-4 sm:mb-6 flex-wrap gap-2">
+          <div className="flex justify-between items-center mb-4 sm:mb-6 flex-wrap gap-2 text-center">
             <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
               <Target size={20} className="text-blue-500" /> Active Bounties
             </h3>
@@ -302,10 +206,10 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
               <div className="h-full flex items-center justify-center py-10 opacity-50">
                 <Loader2 size={32} className="animate-spin text-blue-500" />
               </div>
-            ) : bounties.map(bounty => (
+            ) : bounties.slice(0, 3).map(bounty => (
               <div 
                 key={bounty.id} 
-                onClick={() => handleBountyClick(bounty.id)}
+                onClick={() => onBountyClick(bounty.id)}
                 className={`bg-white border rounded-xl p-4 shadow-sm transition-colors cursor-pointer relative overflow-hidden group 
                   ${bounty.status === 'pending' ? 'border-blue-200' : 
                     bounty.status === 'completed' ? 'border-green-200 bg-green-50/30' : 
@@ -345,6 +249,13 @@ export default function Dashboard({ user, userData, prediction, onReset }) {
               </div>
             ))}
           </div>
+
+          <button 
+            onClick={onViewBounties}
+            className="w-full mt-6 flex items-center justify-center gap-2 py-3 bg-neutral-50 text-neutral-600 text-[11px] font-bold uppercase tracking-widest rounded-xl border border-neutral-100 hover:bg-neutral-100 transition-all group"
+          >
+            Quest Board <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
       </div>
 
