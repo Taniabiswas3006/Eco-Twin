@@ -15,9 +15,9 @@ export default function Dashboard({
   const { carbon_footprint, energy_consumption, waste_generation, sustainability_score, insights } = prediction;
 
   const chartData = [
-    { name: 'Carbon', value: carbon_footprint, fill: '#5c9853' },
-    { name: 'Energy', value: energy_consumption, fill: '#3B82F6' },
-    { name: 'Waste', value: waste_generation, fill: '#F59E0B' }
+    { name: 'Carbon', value: carbon_footprint, fill: '#ef4444' }, // Red
+    { name: 'Energy', value: energy_consumption, fill: '#fbbf24' }, // Amber
+    { name: 'Waste', value: waste_generation * 8, fill: '#3b82f6' }  // Blue (scaled for visibility)
   ];
 
   const getScoreColor = (score) => {
@@ -28,9 +28,9 @@ export default function Dashboard({
 
   const getMetricIcon = (type) => {
     switch (type) {
-      case 'carbon': return <Leaf size={16} />;
-      case 'energy': return <Zap size={16} />;
-      case 'waste': return <Trash2 size={16} />;
+      case 'carbon': return <Leaf size={16} className="text-red-500" />;
+      case 'energy': return <Zap size={16} className="text-amber-500" />;
+      case 'waste': return <Trash2 size={16} className="text-blue-500" />;
       default: return null;
     }
   };
@@ -150,7 +150,7 @@ export default function Dashboard({
                           cursor={{fill: '#F3F4F6'}}
                           contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
                         />
-                        <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={50}>
+                        <Bar dataKey="value" radius={[12, 12, 0, 0]} maxBarSize={60}>
                           {chartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={entry.fill} />
                           ))}
