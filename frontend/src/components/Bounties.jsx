@@ -104,23 +104,22 @@ export default function Bounties({ user, bounties: initialBounties, xp, level, h
                        initial={{ opacity: 0, y: 20 }}
                        animate={{ opacity: 1, y: 0 }}
                        exit={{ opacity: 0, scale: 0.95 }}
-                       onClick={() => handleBountyClick(bounty.id)}
-                       className={`group relative bg-white border-2 rounded-[2.5rem] p-8 transition-all cursor-pointer hover:shadow-2xl hover:shadow-neutral-200/50 
+                       className={`group relative bg-white border-2 rounded-[2.5rem] p-6 sm:p-8 transition-all hover:shadow-2xl hover:shadow-neutral-200/50 
                          ${bounty.status === 'completed' ? 'border-eco-100/30' : 'border-transparent shadow-xl shadow-neutral-100/40'}`}
                     >
-                       <div className="flex justify-between items-start mb-10">
-                          <div className={`size-16 rounded-3xl flex items-center justify-center shadow-lg transition-all duration-500 group-hover:scale-110
+                       <div className="flex justify-between items-start mb-8">
+                          <div className={`size-14 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 group-hover:scale-110
                             ${bounty.status === 'completed' ? 'bg-eco-600 text-white shadow-eco-500/20' : 'bg-[#5c9853]/10 text-[#5c9853]'}`}>
                              <CheckCircle2 size={24} className={bounty.status === 'completed' ? 'opacity-100' : 'opacity-40'} />
                           </div>
                           <div className="text-right">
                              <div className="text-lg font-black text-neutral-900">+{bounty.points}</div>
-                             <div className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">POINTS</div>
+                             <div className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none">POINTS</div>
                           </div>
                        </div>
 
-                       <div className="space-y-4">
-                          <h4 className={`text-xl font-black tracking-tighter transition-colors ${bounty.status === 'completed' ? 'text-eco-700' : 'text-neutral-900'}`}>
+                       <div className="space-y-4 mb-6">
+                          <h4 className={`text-xl font-black tracking-tighter transition-colors ${bounty.status === 'completed' ? 'text-eco-700 font-bold' : 'text-neutral-900'}`}>
                              {bounty.title}
                           </h4>
                           
@@ -133,16 +132,38 @@ export default function Bounties({ user, bounties: initialBounties, xp, level, h
                           </div>
                        </div>
 
-                       {/* Progress bar overlay for active missions */}
-                       {bounty.status === 'active' && (
-                          <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-neutral-50 overflow-hidden">
-                             <motion.div 
-                               initial={{ width: 0 }}
-                               animate={{ width: `${bounty.progress}%` }}
-                               className="h-full bg-eco-500"
-                             />
-                          </div>
-                       )}
+                       <div className="space-y-4 pt-2">
+                         {bounty.status !== 'completed' ? (
+                           <button 
+                             onClick={() => handleBountyClick(bounty.id)}
+                             className={`w-full py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2
+                               ${bounty.status === 'active' 
+                                 ? 'bg-neutral-900 text-white hover:bg-neutral-800 shadow-lg shadow-neutral-200' 
+                                 : 'bg-neutral-50 text-neutral-400 border border-neutral-100 hover:bg-white hover:text-neutral-900'}`}
+                           >
+                             {bounty.status === 'active' ? (
+                               <><Sparkles size={14} className="text-eco-400" /> Claim Progress</>
+                             ) : (
+                               'Start Bounty'
+                             )}
+                           </button>
+                         ) : (
+                           <div className="w-full py-3 bg-eco-50/50 rounded-2xl border border-eco-100 flex items-center justify-center gap-2 text-[10px] font-black text-eco-600 uppercase tracking-widest">
+                             <CheckCircle2 size={12} /> Mission Success
+                           </div>
+                         )}
+
+                         {/* Progress bar overlay for active missions */}
+                         {bounty.status === 'active' && (
+                            <div className="h-1.5 bg-neutral-50 rounded-full overflow-hidden border border-neutral-100 p-0.5">
+                               <motion.div 
+                                 initial={{ width: 0 }}
+                                 animate={{ width: `${bounty.progress}%` }}
+                                 className="h-full bg-eco-500 rounded-full"
+                               />
+                            </div>
+                         )}
+                       </div>
                     </motion.div>
                  ))}
               </AnimatePresence>

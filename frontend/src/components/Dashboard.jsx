@@ -209,11 +209,10 @@ export default function Dashboard({
             ) : bounties.slice(0, 3).map(bounty => (
               <div 
                 key={bounty.id} 
-                onClick={() => onBountyClick(bounty.id)}
-                className={`bg-white border rounded-xl p-4 shadow-sm transition-colors cursor-pointer relative overflow-hidden group 
+                className={`bg-white border rounded-xl p-4 shadow-sm transition-colors relative overflow-hidden group 
                   ${bounty.status === 'pending' ? 'border-blue-200' : 
                     bounty.status === 'completed' ? 'border-green-200 bg-green-50/30' : 
-                    'border-neutral-100 hover:border-blue-200'}`}
+                    'border-neutral-100'}`}
               >
                 {bounty.status === 'pending' && <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full transition-transform group-hover:scale-110" />}
                 
@@ -228,7 +227,12 @@ export default function Dashboard({
                     </p>
                   </div>
                   {bounty.status === 'pending' ? (
-                    <span className="bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md group-hover:bg-blue-600 transition-colors">Accept</span>
+                    <button 
+                      onClick={() => onBountyClick(bounty.id)}
+                      className="bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md hover:bg-blue-600 transition-colors"
+                    >
+                      Accept
+                    </button>
                   ) : bounty.status === 'completed' ? (
                     <motion.span initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded inline-block">+{bounty.points} XP</motion.span>
                   ) : (
@@ -237,13 +241,21 @@ export default function Dashboard({
                 </div>
 
                 {bounty.status === 'active' && (
-                  <div className="w-full bg-neutral-100 rounded-full h-1.5 mt-3 relative overflow-hidden">
-                    <motion.div 
-                      className="bg-blue-500 h-1.5 rounded-full" 
-                      initial={{ width: `${bounty.progress - 20}%` }}
-                      animate={{ width: `${bounty.progress}%` }}
-                      transition={{ type: "spring", stiffness: 100 }}
-                    />
+                  <div className="mt-4 space-y-3 relative z-10">
+                    <div className="w-full bg-neutral-100 rounded-full h-1 mt-3 relative overflow-hidden">
+                      <motion.div 
+                        className="bg-blue-500 h-full rounded-full" 
+                        initial={{ width: `${bounty.progress - 20}%` }}
+                        animate={{ width: `${bounty.progress}%` }}
+                        transition={{ type: "spring", stiffness: 100 }}
+                      />
+                    </div>
+                    <button 
+                      onClick={() => onBountyClick(bounty.id)}
+                      className="w-full py-2 bg-neutral-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-neutral-800 transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <Sparkles size={12} className="text-eco-400" /> Claim Progress
+                    </button>
                   </div>
                 )}
               </div>
