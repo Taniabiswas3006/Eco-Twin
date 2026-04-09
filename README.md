@@ -1,7 +1,7 @@
 # 🌱 EcoTwin: Gamified Sustainability Dashboard
 
 EcoTwin is a state-of-the-art **Digital Twin** focused on environmental tracking. It models a user's real-life behavioral data and visualizes their carbon footprint, energy consumption, and waste generation. By blending algorithms with interactive web features, EcoTwin translates abstract sustainability metrics into tangible, gamified financial and environmental insights.
-
+hii
 ---
 
 ## 🚀 Key Features
