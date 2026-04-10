@@ -323,17 +323,38 @@ def action_calculate(current_user):
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
-    username, password, email = data['username'], data['password'], data['email']
-    hashed_password = generate_password_hash(password)
     try:
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
+        name = data.get('name', '')
+        phone = data.get('phone', '')
+        gender = data.get('gender', '')
+        
+        if not username or not password or not email:
+            return jsonify({"error": "Missing required fields"}), 400
+            
+        hashed_password = generate_password_hash(password)
+        
         conn = get_db_connection()
         c = conn.cursor()
         placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
-        c.execute(f"INSERT INTO users (username, email, password) VALUES ({placeholder}, {placeholder}, {placeholder})", (username, email, hashed_password))
-        conn.commit(); conn.close()
-        token = jwt.encode({'username': username, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)}, app.config['SECRET_KEY'], algorithm="HS256")
-        return jsonify({"message": "User created", "token": token}), 201
+        c.execute(
+            f"INSERT INTO users (username, email, password, name, phone, gender) VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})", 
+            (username, email, hashed_password, name, phone, gender)
+        )
+        conn.commit()
+        conn.close()
+        
+        token = jwt.encode({
+            'username': username, 
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        }, app.config['SECRET_KEY'], algorithm="HS256")
+        
+        return jsonify({"message": "User created", "token": token, "username": username, "email": email}), 201
     except Exception as e:
+        if "UNIQUE constraint failed" in str(e) or "duplicate key value" in str(e):
+            return jsonify({"error": "Username or Email already exists"}), 409
         return jsonify({"error": str(e)}), 500
 
 @app.route('/login', methods=['POST'])
@@ -359,13 +380,30 @@ def login():
 def get_profile(current_user):
     username = request.args.get('username')
     try:
-        conn = get_db_connection(); c = conn.cursor()
+        conn = get_db_connection()
+        c = conn.cursor()
         placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
-        c.execute(f"SELECT name, email, phone FROM users WHERE username={placeholder}", (username,))
-        row = c.fetchone(); conn.close()
+        c.execute(f"SELECT name, email, phone, gender FROM users WHERE username={placeholder}", (username,))
+        row = c.fetchone()
+        conn.close()
+        
         if row:
-            return jsonify({"name": row[0] or '', "email": row[1] or '', "phone": row[2] or ''}), 200
-        return jsonify({"error": "Not found"}), 404
+            # Handle both SQLite (Row) and PostgreSQL (Tuple)
+            if hasattr(row, 'keys'): # SQLite
+                return jsonify({
+                    "name": row['name'] or '',
+                    "email": row['email'] or '',
+                    "phone": row['phone'] or '',
+                    "gender": row['gender'] or ''
+                }), 200
+            else: # PostgreSQL/Tuple
+                return jsonify({
+                    "name": row[0] or '',
+                    "email": row[1] or '',
+                    "phone": row[2] or '',
+                    "gender": row[3] or ''
+                }), 200
+        return jsonify({"error": "User not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
