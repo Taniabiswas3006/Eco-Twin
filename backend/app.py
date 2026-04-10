@@ -261,10 +261,63 @@ def simulate():
 @token_required
 def action_calculate(current_user):
     data = request.json
-    mode = data.get("mode")
+    mode = data.get("mode") # 'offset', 'meal', 'purchase'
+    ai_analysis = ""
+    
     if mode == 'offset':
         co2_amount = float(data.get("amount", 0))
-        return jsonify({"mode": "offset", "results": {"trees_needed": round(co2_amount / 1.75, 1)}})
+        trees = round(co2_amount / 1.75, 1)
+        solar_panels = round(co2_amount / 40.0, 2)
+        plastic_days = round(co2_amount / 0.5, 0)
+        
+        prompt = f"Explain why {trees} trees or {solar_panels} solar panels are a good way to offset {co2_amount}kg of CO2. Provide a 20-word briefing."
+        ai_analysis = get_ai_insight(prompt)
+        
+        return jsonify({
+            "mode": "offset",
+            "results": {
+                "trees_needed": trees,
+                "solar_panels": solar_panels,
+                "plastic_free_days": int(plastic_days)
+            },
+            "ai_analysis": ai_analysis
+        })
+        
+    elif mode == 'meal':
+        factors = {"beef": 27.0, "chicken": 6.9, "fish": 6.1, "veg": 2.0, "vegan": 1.2}
+        items = data.get("items", [])
+        total_co2 = 0
+        ingredients_str = ""
+        for item in items:
+            total_co2 += factors.get(item['type'], 2.0) * float(item.get('weight', 0.1))
+            ingredients_str += f"{item['weight']}kg of {item['type']}, "
+            
+        prompt = f"A meal with {ingredients_str} generates {total_co2}kg CO2. Suggest a 15-word micro-improvement."
+        ai_analysis = get_ai_insight(prompt)
+            
+        return jsonify({
+            "mode": "meal",
+            "impact_kg": round(total_co2, 2),
+            "grade": "A+" if total_co2 < 0.5 else "B" if total_co2 < 1.5 else "D",
+            "ai_analysis": ai_analysis
+        })
+        
+    elif mode == 'purchase':
+        m_factors = {"cotton": 8.3, "polyester": 5.5, "leather": 17.0, "electronics": 25.0}
+        material = data.get("material", "cotton")
+        weight = float(data.get("weight", 0.5))
+        impact = m_factors.get(material.lower(), 5.0) * weight
+        
+        prompt = f"Buying a {weight}kg item made of {material} generates {impact}kg CO2. Provide one 15-word sustainable tip for this material."
+        ai_analysis = get_ai_insight(prompt)
+        
+        return jsonify({
+            "mode": "purchase",
+            "impact_kg": round(impact, 2),
+            "comparison": f"Roughly {round(impact*5, 1)}km of driving emissions.",
+            "ai_analysis": ai_analysis
+        })
+        
     return jsonify({"error": "Invalid mode"}), 400
 
 @app.route('/signup', methods=['POST'])
