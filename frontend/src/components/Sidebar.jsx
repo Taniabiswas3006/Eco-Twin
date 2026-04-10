@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, User, Trophy, LogOut, Leaf, Menu, X, Calculator } from 'lucide-react';
+import { LayoutDashboard, User, Trophy, LogOut, Leaf, Menu, X, Calculator, Compass, Sprout } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, onLogout, user }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,9 +21,9 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, user }) {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'footprint', label: 'Carbon Footprint', icon: <Calculator size={20} /> },
+    { id: 'hub', label: 'Action Hub', icon: <Sprout size={20} /> },
     { id: 'profile', label: 'My Profile', icon: <User size={20} /> },
-    { id: 'bounties', label: 'Impact Bounties', icon: <Trophy size={20} /> },
+    { id: 'nexus', label: 'Sustainability Nexus', icon: <Compass size={20} /> },
   ];
 
   const sidebarContent = (

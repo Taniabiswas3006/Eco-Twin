@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -6,16 +6,9 @@ import InputForm from './InputForm';
 import Dashboard from './Dashboard';
 import Sidebar from './Sidebar';
 import Profile from './Profile';
-import Bounties from './Bounties';
-import CarbonCalculator from './CarbonCalculator';
+import SustainabilityNexus from './SustainabilityNexus';
+import EcoActionHub from './EcoActionHub';
 
-const DEFAULT_BOUNTIES = [
-  { id: 1, title: 'Meatless Weekend', deadline: '2 days left', points: 50, progress: 0, status: 'active' },
-  { id: 2, title: 'Transit Pioneer', deadline: '5 days left', points: 120, progress: 40, status: 'active' },
-  { id: 3, title: 'Zero AC Bounty', deadline: 'Tonight', points: 200, progress: 0, status: 'pending' },
-  { id: 4, title: 'Solar Synchronizer', deadline: 'Daily (10am-2pm)', points: 100, progress: 0, status: 'pending' },
-  { id: 5, title: 'Eco-Commuter', deadline: '3 days streak', points: 150, progress: 0, status: 'pending' },
-];
 
 export default function DigitalTwin() {
   const navigate = useNavigate();
@@ -25,11 +18,17 @@ export default function DigitalTwin() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState(null);
   const [hasPrevious, setHasPrevious] = useState(false);
+  const bountyClickTimeout = useRef(null);
 
-  const [level, setLevel] = useState(1);
-  const [xp, setXp] = useState(0);
-  const [bounties, setBounties] = useState([]);
-  const [loadingBounties, setLoadingBounties] = useState(true);
+  const getAuthHeaders = () => {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) return { 'Content-Type': 'application/json' };
+    const { token } = JSON.parse(storedUser);
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -39,74 +38,9 @@ export default function DigitalTwin() {
       if (localStorage.getItem(`eco_twin_prev_${parsedUser.username}`)) {
         setHasPrevious(true);
       }
-      fetchBounties(parsedUser);
     }
   }, []);
 
-  const fetchBounties = async (currentUser) => {
-    if (!currentUser) return;
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/get-bounties?username=${currentUser.username}`);
-      if (res.ok) {
-        const data = await res.json();
-        setXp(data.xp || 0);
-        setLevel(data.level || 1);
-        if (data.bounties && Array.isArray(data.bounties) && data.bounties.length > 0) {
-          setBounties(data.bounties);
-        } else {
-          setBounties(DEFAULT_BOUNTIES);
-        }
-      } else {
-        setBounties(DEFAULT_BOUNTIES);
-      }
-    } catch (err) { 
-      setBounties(DEFAULT_BOUNTIES);
-    } finally { 
-      setLoadingBounties(false); 
-    }
-  };
-
-  const handleBountyClick = (id) => {
-    let updatedXp = xp;
-    let updatedLevel = level;
-    
-    const updatedBounties = bounties.map(b => {
-      if (b.id !== id) return b;
-      if (b.status === 'pending') return { ...b, status: 'active' };
-      if (b.status === 'active') {
-        const newProgress = b.progress + 20; 
-        if (newProgress >= 100) {
-          updatedXp += b.points;
-          if (updatedXp >= updatedLevel * 500) updatedLevel += 1;
-          return { ...b, progress: 100, status: 'completed' };
-        }
-        return { ...b, progress: newProgress };
-      }
-      return b;
-    });
-
-    setBounties(updatedBounties);
-    setXp(updatedXp);
-    setLevel(updatedLevel);
-    saveBounties(updatedBounties, updatedXp, updatedLevel);
-  };
-
-  const saveBounties = async (newBounties, newXp, newLevel) => {
-    const currentUser = user || JSON.parse(localStorage.getItem('user'));
-    if (!currentUser) return;
-    try {
-      await fetch(`${import.meta.env.VITE_API_URL}/update-bounties`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: currentUser.username,
-          bounties: newBounties,
-          xp: newXp,
-          level: newLevel
-        })
-      });
-    } catch (err) { console.error(err); }
-  };
 
   const handleLoadPrevious = () => {
     if (user && user.username) {
@@ -126,30 +60,51 @@ export default function DigitalTwin() {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/predict`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(data),
       });
       
       const result = await response.json();
       
+      if (!result || typeof result !== 'object') {
+        throw new Error("Invalid response from server");
+      }
+
+      // Ensure properties exist to prevent destructuring crashes
+      const safeResult = {
+        carbon_footprint: result.carbon_footprint || 0,
+        energy_consumption: result.energy_consumption || 0,
+        waste_generation: result.waste_generation || 0,
+        sustainability_score: result.sustainability_score || 0,
+        category: result.category || 'Environmentalist',
+        insights: Array.isArray(result.insights) ? result.insights : ["Analyzing results..."]
+      };
+
       // Safety: Ensure exactly 4 insights for UI balance
-      if (result.insights && result.insights.length < 4) {
+      if (safeResult.insights.length < 4) {
         const fallbacks = [
           "Regular maintenance of appliances can improve energy efficiency by up to 15%.",
           "Consider using LED bulbs to reduce lighting-related electricity costs significantly.",
           "Choosing local seasonal produce can further lower your carbon footprint metrics.",
           "Composting organic waste can reduce your contribution to landfills nearly by half."
         ];
-        while (result.insights.length < 4) {
-          result.insights.push(fallbacks[result.insights.length]);
+        while (safeResult.insights.length < 4) {
+          safeResult.insights.push(fallbacks[safeResult.insights.length]);
         }
       }
       
-      setPrediction(result);
+      setPrediction(safeResult);
       if (user && user.username) {
-        localStorage.setItem(`eco_twin_prev_${user.username}`, JSON.stringify({ data, prediction: result }));
+        // Save for profile persistence
+        const checkData = {
+          total: safeResult.carbon_footprint,
+          yearlyTotal: (safeResult.carbon_footprint * 365 / 1000).toFixed(1),
+          sustainability_score: safeResult.sustainability_score,
+          category: safeResult.category,
+          timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('eco_twin_latest_check', JSON.stringify(checkData));
+        localStorage.setItem(`eco_twin_prev_${user.username}`, JSON.stringify({ data, prediction: safeResult }));
         setHasPrevious(true);
       }
     } catch (error) {
@@ -178,7 +133,7 @@ export default function DigitalTwin() {
     navigate('/');
   };
 
-  const showSidebar = !!prediction || activeTab === 'profile' || activeTab === 'bounties' || activeTab === 'footprint';
+  const showSidebar = !!prediction || activeTab === 'profile' || activeTab === 'nexus' || activeTab === 'hub';
 
   if (!showSidebar) {
     return (
@@ -230,23 +185,18 @@ export default function DigitalTwin() {
                 userData={userData} 
                 prediction={prediction} 
                 onReset={resetJourney}
-                xp={xp}
-                level={level}
-                bounties={bounties}
-                loadingBounties={loadingBounties}
-                onBountyClick={handleBountyClick}
-                onViewBounties={() => setActiveTab('bounties')}
+                onViewNexus={() => setActiveTab('nexus')}
               />
             </motion.div>
-          ) : activeTab === 'footprint' ? (
+          ) : activeTab === 'hub' ? (
             <motion.div
-              key="footprint-view"
+              key="hub-view"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className="w-full"
             >
-              <CarbonCalculator user={user} />
+              <EcoActionHub user={user} />
             </motion.div>
           ) : activeTab === 'profile' ? (
             <motion.div
@@ -260,18 +210,16 @@ export default function DigitalTwin() {
             </motion.div>
           ) : (
             <motion.div
-              key="bounties-view"
+              key="nexus-view"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className="w-full"
             >
-              <Bounties 
+              <SustainabilityNexus 
                 user={user} 
-                bounties={bounties}
-                xp={xp}
-                level={level}
-                handleBountyClick={handleBountyClick}
+                userData={userData} 
+                prediction={prediction} 
               />
             </motion.div>
           )}

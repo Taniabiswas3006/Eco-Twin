@@ -36,7 +36,14 @@ export default function Profile({ user: initialUser }) {
             return;
          }
          try {
-            const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-profile?username=${mainUser.username}`);
+            const storedUser = localStorage.getItem('user');
+            const token = storedUser ? JSON.parse(storedUser).token : null;
+            
+            const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-profile?username=${mainUser.username}`, {
+               headers: {
+                  'Authorization': `Bearer ${token}`
+               }
+            });
             if (resp.ok) {
                const data = await resp.json();
                const fullUser = { ...mainUser, ...data };
@@ -133,22 +140,25 @@ export default function Profile({ user: initialUser }) {
                      </button>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-                     <MiniStat label="CO₂ FOOTPRINT" value={lastCheck ? `${lastCheck.total} kg` : '-- kg'} color="text-eco-600" />
-                     <MiniStat label="YEARLY EST." value={lastCheck ? `${lastCheck.yearlyTotal} T` : '-- T'} color="text-emerald-500" />
-                     <MiniStat label="GLOBAL RANK" value={stats.rank} color="text-blue-500" />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                     <MiniStat 
+                        label="CO₂ FOOTPRINT" 
+                        value={lastCheck?.total ? `${lastCheck.total} kg` : '-- kg'} 
+                        color="text-eco-600" 
+                     />
+                     <MiniStat 
+                        label="SUSTAINABILITY" 
+                        value={lastCheck?.sustainability_score !== undefined ? `${lastCheck.sustainability_score}` : '--'} 
+                        color="text-emerald-500" 
+                     />
+                     <MiniStat 
+                        label="LOCAL IMPACT" 
+                        value={lastCheck?.sustainability_score !== undefined ? (lastCheck.sustainability_score > 60 ? 'POSITIVE' : 'BALANCED') : 'SYNCING'} 
+                        color="text-blue-500" 
+                     />
                      <MiniStat label="STATUS" value={stats.status} color="text-orange-500" />
                   </div>
 
-                  <div>
-                     <p className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em] mb-4">Milestone Validation Badges</p>
-                     <div className="flex flex-wrap gap-3">
-                        <BadgePill icon={<Leaf size={14}/>} label="Tree Planter" color="emerald" active={!!lastCheck} />
-                        <BadgePill icon={<Zap size={14}/>} label="Watt Saver" color="blue" active={!!lastCheck} />
-                        <BadgePill icon={<Car size={14}/>} label="Transit Hero" color="orange" active={!!lastCheck} />
-                        <BadgePill icon={<Shield size={14}/>} label="Guardian" color="neutral" active />
-                     </div>
-                  </div>
                </div>
                
                <div 
@@ -196,22 +206,6 @@ function MiniStat({ label, value, color }) {
       <div className="bg-neutral-50/50 p-4 rounded-2xl border border-neutral-50">
          <p className="text-[9px] font-black text-neutral-400 uppercase tracking-widest leading-none mb-1.5">{label}</p>
          <p className={`text-xl font-black ${color} tracking-tighter`}>{value}</p>
-      </div>
-   );
-}
-
-function BadgePill({ icon, label, color, active }) {
-   const colorMap = {
-      emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-      blue: 'bg-blue-50 text-blue-600 border-blue-100',
-      orange: 'bg-orange-50 text-orange-600 border-orange-100',
-      neutral: 'bg-neutral-50 text-neutral-600 border-neutral-100'
-   };
-
-   return (
-      <div className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black border uppercase tracking-tight ${active ? colorMap[color] : 'bg-neutral-50 text-neutral-300 border-neutral-100 opacity-50 grayscale'} hover:scale-105 transition-transform cursor-default select-none`}>
-         {icon}
-         {label}
       </div>
    );
 }

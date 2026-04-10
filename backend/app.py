@@ -5,12 +5,41 @@ import pickle
 import pandas as pd
 import numpy as np
 import os
+import jwt
+import datetime
+import warnings
+from sklearn.exceptions import InconsistentVersionWarning
+from functools import wraps
+
+# Silence the version mismatch warnings from pre-trained .pkl models
+warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 
 load_dotenv()
 
+from gemini_engine import get_ai_insight
+
 app = Flask(__name__)
+# Upgraded secret key to 32+ characters to resolve InsecureKeyLengthWarning
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "eco-twin-ultra-secure-fallback-secret-1234567890")
 origins_str = os.environ.get("CORS_ORIGIN", "*")
 CORS(app, origins=[o.strip() for o in origins_str.split(',') if o.strip()] if origins_str != "*" else "*", supports_credentials=True)
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'error': 'Token is missing!'}), 401
+        try:
+            # Expected format: Bearer <token>
+            if 'Bearer ' in token:
+                token = token.split(' ')[1]
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = data['username']
+        except Exception as e:
+            return jsonify({'error': f'Token is invalid: {str(e)}'}), 401
+        return f(current_user, *args, **kwargs)
+    return decorated
 
 # Load the models
 try:
@@ -39,10 +68,15 @@ def prepare_features(data):
     food_map = {"non-veg": 3, "veg": 1}
     
     travel_val = travel_map.get(data.get("travel", "car").lower(), 2)
-    electricity_val = float(data.get("electricity", 5))
-    food_val = food_map.get(data.get("food", "veg").lower(), 2)
-    shopping_val = float(data.get("shopping", 2))
-    ac_val = float(data.get("ac", 3))
+    
+    # Validation & Clamping
+    try:
+        electricity_val = max(0, min(24, float(data.get("electricity", 5))))
+        food_val = food_map.get(data.get("food", "veg").lower(), 2)
+        shopping_val = max(0, min(20, float(data.get("shopping", 2))))
+        ac_val = max(0, min(24, float(data.get("ac", 3))))
+    except (ValueError, TypeError):
+        electricity_val, food_val, shopping_val, ac_val = 5, 2, 2, 3
     
     return np.array([[travel_val, electricity_val, food_val, shopping_val, ac_val]])
 
@@ -114,42 +148,32 @@ def predict():
     else:
         category = "High Impact"
     
-    # --- Dynamic insights (Rule-based) ---
-    insights = []
+    # --- Dynamic AI Insights (Gemini Powered) ---
+    travel_map = {3: "Car", 2: "Public Transport", 1: "Bike/Walk"}
+    food_map = {3: "Non-Veg", 1: "Veg/Vegan"}
     
-    travel_val = features[0][0]
-    electricity_val = features[0][1]
-    food_val = features[0][2]
-    shopping_val = features[0][3]
-    ac_val = features[0][4]
+    ai_prompt = (
+        f"Data: {carbon_pred}kg CO2, {energy_pred}kWh, {waste_pred}kg waste. "
+        f"Context: Travels by {travel_map.get(features[0][0], 'Car')}, "
+        f"{features[0][1]}h electricity, {features[0][4]}h AC, {food_map.get(features[0][2], 'Veg')} diet. "
+        "Provide exactly 4 distinct actionable eco-tips. "
+        "Each tip MUST be between 20 to 25 words long for visual symmetry. "
+        "Separate tips with the '|' symbol. No numbers."
+    )
     
-    # 1. Transport Insight
-    if travel_val == 3:
-        insights.append(f"Driving adds ~{round(12 * 3, 1)} units to your carbon footprint. Switching to public transport could cut it by 33%.")
-    elif travel_val == 2:
-        insights.append("Using public transport is great! Consider biking for even lower emissions.")
-    else:
-        insights.append("Amazing! Biking/walking is the lowest-emission choice.")
-    
-    # 2. Power Insight
-    if ac_val > 5:
-        insights.append(f"You use AC/heavy appliances {int(ac_val)} hrs/day — this is your biggest energy driver. Even 1 hr less saves ~7 kWh/month.")
-    elif electricity_val > 6:
-        insights.append(f"Your general electricity use ({int(electricity_val)} hrs/day) is above average. Smart power strips could help reduce standby waste.")
-    else:
-        insights.append(f"Energy usage ({int(electricity_val + ac_val)} hrs) is efficient. Further optimization can come from using energy-star appliances.")
+    try:
+        raw_ai_response = get_ai_insight(ai_prompt)
+        insights = [s.strip() for s in raw_ai_response.split('|') if len(s.strip()) > 10][:4]
         
-    # 3. Food/Diet Insight
-    if food_val == 3:
-        insights.append("A non-veg diet contributes significantly to your carbon score. Even 2 meatless days/week can make a big difference.")
-    else:
-        insights.append("Great choice! A plant-based diet keeps your food-related emissions low.")
-    
-    # 4. Shopping/Waste Insight
-    if shopping_val > 4:
-        insights.append(f"Shopping {int(shopping_val)}x/week generates extra packaging waste. Try consolidating trips and buying in bulk.")
-    else:
-        insights.append("Your low frequency of shopping helps keep your waste generation below city averages. Keep it up!")
+        while len(insights) < 4:
+            insights.append("Consider upgrading to high-efficiency LED bulbs to reduce secondary energy consumption and lower your monthly utility costs significantly over time.")
+    except Exception:
+        insights = [
+            f"Your current carbon footprint of {carbon_pred}kg is driven by transport. Switching to public transit once a week could lower your impact by fifteen percent.",
+            "Energy usage is reaching peak zones in your house. Installing a smart thermostat would help automate cooling and save energy while you are away.",
+            "Your dietary choices represent a major opportunity. Transitioning to just two meat-free days per week can dramatically reduce your personal methane and nitrous oxide contributions.",
+            "Consolidating your weekly shopping trips into a single run reduces packaging waste. Buying in bulk further minimizes the plastic footprint of your household cycles."
+        ]
     
     return jsonify({
         "carbon_footprint": round(carbon_pred, 2),
@@ -172,12 +196,17 @@ def simulate():
     base_features = prepare_features(baseline_data)
     new_features = prepare_features(new_data)
     
+    # Wrap in DataFrames to avoid 'valid feature names' UserWarnings
+    feature_names = ['travel', 'electricity', 'meat', 'shopping', 'ac']
+    base_df = pd.DataFrame(base_features, columns=feature_names)
+    new_df = pd.DataFrame(new_features, columns=feature_names)
+    
     try:
-        base_carbon = float(carbon_model.predict(base_features)[0]) if carbon_model else 40.0
-        new_carbon = float(carbon_model.predict(new_features)[0]) if carbon_model else 30.0
+        base_carbon = float(carbon_model.predict(base_df)[0]) if carbon_model else 40.0
+        new_carbon = float(carbon_model.predict(new_df)[0]) if carbon_model else 30.0
         
-        base_energy = float(energy_model.predict(base_features)[0]) if energy_model else 25.0
-        new_energy = float(energy_model.predict(new_features)[0]) if energy_model else 20.0
+        base_energy = float(energy_model.predict(base_df)[0]) if energy_model else 25.0
+        new_energy = float(energy_model.predict(new_df)[0]) if energy_model else 20.0
         
         # Waste is a classifier — derive meaningful values
         base_s = float(baseline_data.get("shopping", 2))
@@ -186,8 +215,8 @@ def simulate():
         new_m = {"non-veg": 3, "veg": 1}.get(new_data.get("food", "veg").lower(), 2)
         
         if waste_model:
-            base_wc = int(waste_model.predict(base_features)[0])
-            new_wc = int(waste_model.predict(new_features)[0])
+            base_wc = int(waste_model.predict(base_df)[0])
+            new_wc = int(waste_model.predict(new_df)[0])
             base_waste = ((base_s * 1.2) + (base_m * 0.8) + 1.5) * (1.8 if base_wc == 1 else 0.7)
             new_waste = ((new_s * 1.2) + (new_m * 0.8) + 1.5) * (1.8 if new_wc == 1 else 0.7)
         else:
@@ -229,6 +258,69 @@ def simulate():
             "waste_generation": round(float(new_waste), 2)
         }
     })
+
+@app.route('/action-calculate', methods=['POST'])
+@token_required
+def action_calculate(current_user):
+    data = request.json
+    mode = data.get("mode") # 'offset', 'meal', 'purchase'
+    ai_analysis = ""
+    
+    if mode == 'offset':
+        co2_amount = float(data.get("amount", 0))
+        trees = round(co2_amount / 1.75, 1)
+        solar_panels = round(co2_amount / 40.0, 2)
+        plastic_days = round(co2_amount / 0.5, 0)
+        
+        prompt = f"Explain why {trees} trees or {solar_panels} solar panels are a good way to offset {co2_amount}kg of CO2."
+        ai_analysis = get_ai_insight(prompt)
+        
+        return jsonify({
+            "mode": "offset",
+            "results": {
+                "trees_needed": trees,
+                "solar_panels": solar_panels,
+                "plastic_free_days": int(plastic_days)
+            },
+            "ai_analysis": ai_analysis
+        })
+        
+    elif mode == 'meal':
+        factors = {"beef": 27.0, "chicken": 6.9, "fish": 6.1, "veg": 2.0, "vegan": 1.2}
+        items = data.get("items", [])
+        total_co2 = 0
+        ingredients_str = ""
+        for item in items:
+            total_co2 += factors.get(item['type'], 2.0) * float(item.get('weight', 0.1))
+            ingredients_str += f"{item['weight']}kg of {item['type']}, "
+            
+        prompt = f"A meal with {ingredients_str} generates {total_co2}kg CO2. Briefly explain why this matters and suggest a micro-improvement."
+        ai_analysis = get_ai_insight(prompt)
+            
+        return jsonify({
+            "mode": "meal",
+            "impact_kg": round(total_co2, 2),
+            "grade": "A+" if total_co2 < 0.5 else "B" if total_co2 < 1.5 else "D",
+            "ai_analysis": ai_analysis
+        })
+        
+    elif mode == 'purchase':
+        m_factors = {"cotton": 8.3, "polyester": 5.5, "leather": 17.0, "electronics": 25.0}
+        material = data.get("material", "cotton")
+        weight = float(data.get("weight", 0.5))
+        impact = m_factors.get(material.lower(), 5.0) * weight
+        
+        prompt = f"Buying a {weight}kg item made of {material} generates {impact}kg CO2 during manufacturing. Mention one environmental fact about this material choice."
+        ai_analysis = get_ai_insight(prompt)
+        
+        return jsonify({
+            "mode": "purchase",
+            "impact_kg": round(impact, 2),
+            "comparison": f"Roughly {round(impact*5, 1)}km of driving emissions.",
+            "ai_analysis": ai_analysis
+        })
+        
+    return jsonify({"error": "Invalid mode"}), 400
 
 
 import sqlite3
@@ -359,7 +451,13 @@ def signup():
         )
         conn.commit()
         conn.close()
-        return jsonify({"message": "User created successfully", "username": username, "email": email, "token": "dummy-jwt-token"}), 201
+        
+        token = jwt.encode({
+            'username': username,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        }, app.config['SECRET_KEY'], algorithm="HS256")
+        
+        return jsonify({"message": "User created successfully", "username": username, "email": email, "token": token}), 201
     except Exception as e:
         # Check for unique constraint violation across both DB types
         if "UNIQUE constraint failed" in str(e) or "duplicate key value" in str(e):
@@ -389,13 +487,19 @@ def login():
         conn.close()
         
         if row and check_password_hash(row[0], password):
-            # Check row indexing (Postgres uses tuple, sqlite Row or tuple)
             db_email = row['email'] if hasattr(row, 'keys') else row[1]
+            # Use timezone-aware UTC now to resolve DeprecationWarning
+            now = datetime.datetime.now(datetime.timezone.utc)
+            token = jwt.encode({
+                'username': username,
+                'exp': now + datetime.timedelta(hours=24)
+            }, app.config['SECRET_KEY'], algorithm="HS256")
+            
             return jsonify({
                 "message": "Login successful", 
                 "username": username, 
                 "email": db_email,
-                "token": "dummy-jwt-token"
+                "token": token
             }), 200
         else:
             return jsonify({"error": "Invalid username, email or password"}), 401
@@ -405,10 +509,11 @@ def login():
         return jsonify({"error": "Database error"}), 500
 
 @app.route('/get-profile', methods=['GET'])
-def get_profile():
+@token_required
+def get_profile(current_user):
     username = request.args.get('username')
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not username or username != current_user:
+        return jsonify({"error": "Unauthorized user access"}), 403
         
     try:
         conn = get_db_connection()
@@ -441,10 +546,11 @@ def get_profile():
         return jsonify({"error": "Database error"}), 500
 
 @app.route('/update-profile', methods=['POST'])
-def update_profile():
+@token_required
+def update_profile(current_user):
     data = request.json
-    if not data or 'username' not in data:
-        return jsonify({"error": "Username required"}), 400
+    if not data or 'username' not in data or data['username'] != current_user:
+        return jsonify({"error": "Unauthorized user access"}), 403
         
     username = data['username']
     name = data.get('name', '')
@@ -470,10 +576,11 @@ def update_profile():
         return jsonify({"error": "Database error"}), 500
 
 @app.route('/get-settings', methods=['GET'])
-def get_settings():
+@token_required
+def get_settings(current_user):
     username = request.args.get('username')
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not username or username != current_user:
+        return jsonify({"error": "Unauthorized user access"}), 403
         
     try:
         conn = get_db_connection()
@@ -493,10 +600,11 @@ def get_settings():
         return jsonify({"error": "Database error"}), 500
 
 @app.route('/update-settings', methods=['POST'])
-def update_settings():
+@token_required
+def update_settings(current_user):
     data = request.json
-    if not data or 'username' not in data or 'settings' not in data:
-        return jsonify({"error": "Username and settings required"}), 400
+    if not data or 'username' not in data or 'settings' not in data or data['username'] != current_user:
+        return jsonify({"error": "Unauthorized user access"}), 403
         
     username = data['username']
     settings_json = json.dumps(data['settings'])
@@ -514,10 +622,11 @@ def update_settings():
         return jsonify({"error": "Database error"}), 500
 
 @app.route('/get-bounties', methods=['GET'])
-def get_bounties():
+@token_required
+def get_bounties(current_user):
     username = request.args.get('username')
-    if not username:
-        return jsonify({"error": "Username required"}), 400
+    if not username or username != current_user:
+        return jsonify({"error": "Unauthorized user access"}), 403
         
     try:
         conn = get_db_connection()
@@ -547,15 +656,20 @@ def get_bounties():
         return jsonify({"error": "Database error"}), 500
 
 @app.route('/update-bounties', methods=['POST'])
-def update_bounties():
+@token_required
+def update_bounties(current_user):
     data = request.json
-    if not data or 'username' not in data:
-        return jsonify({"error": "Username required"}), 400
+    if not data or 'username' not in data or data['username'] != current_user:
+        return jsonify({"error": "Unauthorized user access"}), 403
         
     username = data['username']
     bounties_json = json.dumps(data.get('bounties', []))
     xp = data.get('xp', 0)
-    level = data.get('level', 1)
+    
+    # Robust Leveling Logic
+    # Level 1: 0-499, Level 2: 500-999, etc.
+    # Recursive level calculation: level = floor(xp / 500) + 1
+    level = max(1, (xp // 500) + 1)
     
     try:
         conn = get_db_connection()

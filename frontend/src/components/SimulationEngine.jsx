@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Leaf, Wind, MapPin, Zap, Flame, Snowflake, ShoppingBag, Utensils, Droplets, Wallet } from 'lucide-react';
 
 export default function SimulationEngine({ userData, currentScore }) {
-  const [simulatedData, setSimulatedData] = useState({ ...userData });
+  const [simulatedData, setSimulatedData] = useState(userData ? { ...userData } : {});
   const [result, setResult] = useState(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const [targetYear, setTargetYear] = useState(2026); // Feature 1: Time Travel

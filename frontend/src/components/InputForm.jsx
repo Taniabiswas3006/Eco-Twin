@@ -34,7 +34,14 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      onComplete(formData);
+      // Clamping before completion for safety
+      const finalData = {
+        ...formData,
+        electricity: Math.max(0, Math.min(24, formData.electricity)),
+        ac: Math.max(0, Math.min(24, formData.ac)),
+        shopping: Math.max(0, Math.min(10, formData.shopping)),
+      };
+      onComplete(finalData);
     }
   };
 

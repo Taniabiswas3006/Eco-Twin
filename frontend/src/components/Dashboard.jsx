@@ -1,23 +1,37 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCcw, Leaf, Zap, Trash2, ArrowUpRight, CheckCircle2, Target, Clock, Trophy, Loader2, ChevronRight } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { RefreshCcw, Leaf, Zap, Trash2, ArrowUpRight, Loader2, ChevronRight, Compass } from 'lucide-react';
 import SimulationEngine from './SimulationEngine';
+import { Typewriter } from './Typewriter';
 
 export default function Dashboard({ 
-  user, userData, prediction, onReset, 
-  xp, level, bounties, loadingBounties, onBountyClick, onViewBounties 
+  user, userData, prediction, onReset, onViewNexus 
 }) {
   const [activeTab, setActiveTab] = useState('overview');
 
-  if (!prediction) return null;
+  if (!prediction || !userData) return (
+     <div className="flex items-center justify-center p-20 text-neutral-400 font-bold uppercase tracking-widest animate-pulse">
+        Initializing Twin...
+     </div>
+  );
 
-  const { carbon_footprint, energy_consumption, waste_generation, sustainability_score, insights } = prediction;
+  const carbon_footprint = prediction?.carbon_footprint || 0;
+  const energy_consumption = prediction?.energy_consumption || 0;
+  const waste_generation = prediction?.waste_generation || 0;
+  const sustainability_score = prediction?.sustainability_score || 0;
+  const insights = Array.isArray(prediction?.insights) ? prediction.insights : [];
+  
+  // Normalization for visual bars (scaling)
+  // We want the bars to look good but not exceed 100% of the container visually
+  const MAX_VISUAL_CARBON = 600;
+  const MAX_VISUAL_ENERGY = 200;
+  const MAX_VISUAL_WASTE = 15;
 
   const chartData = [
-    { name: 'Carbon', value: carbon_footprint, fill: '#ef4444' }, // Red
-    { name: 'Energy', value: energy_consumption, fill: '#fbbf24' }, // Amber
-    { name: 'Waste', value: waste_generation * 8, fill: '#3b82f6' }  // Blue (scaled for visibility)
+    { name: 'Carbon', value: Math.min(carbon_footprint, MAX_VISUAL_CARBON), realValue: carbon_footprint, fill: '#ef4444' },
+    { name: 'Energy', value: Math.min(energy_consumption, MAX_VISUAL_ENERGY), realValue: energy_consumption, fill: '#fbbf24' },
+    { name: 'Waste', value: Math.min(waste_generation * 8, 120), realValue: waste_generation, fill: '#3b82f6' }
   ];
 
   const getScoreColor = (score) => {
@@ -44,7 +58,21 @@ export default function Dashboard({
           <h2 className="text-2xl sm:text-4xl font-black text-neutral-900 tracking-tight">
             Welcome, <span className="text-eco-600">{user?.username || 'Eco Enthusiast'}!</span>
           </h2>
-          <p className="text-neutral-500 text-sm font-medium">Here is your personalized eco-dashboard</p>
+          <div className="text-neutral-500 text-sm font-medium mt-2">
+            <Typewriter 
+              text={[
+                "Here is your personalized eco-dashboard",
+                "Synthesizing environmental architecture...",
+                "Analyzing carbon-lifestyle dependencies...",
+                "Optimizing digital twin synchronization...",
+                "Mapping your sustainability nexus archetype..."
+              ]}
+              speed={70}
+              waitTime={3000}
+              loop={true}
+              cursorChar="_"
+            />
+          </div>
         </div>
         <button 
           onClick={onReset}
@@ -95,16 +123,16 @@ export default function Dashboard({
 
         {/* Analytics Card */}
         <div className="lg:col-span-2 glass-card p-5 sm:p-8 flex flex-col">
-          <div className="flex gap-8 mb-6 border-b border-neutral-100 flex-nowrap overflow-x-auto scrollbar-hide">
+          <div className="flex gap-10 mb-6 border-b border-neutral-100">
             <button 
               onClick={() => setActiveTab('overview')}
-              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'overview' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
+              className={`font-black pb-4 -mb-[1px] border-b-2 transition-all text-xs uppercase tracking-widest ${activeTab === 'overview' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
             >
               Overview
             </button>
             <button 
               onClick={() => setActiveTab('simulation')}
-              className={`font-medium pb-4 -mb-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${activeTab === 'simulation' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
+              className={`font-black pb-4 -mb-[1px] border-b-2 transition-all text-xs uppercase tracking-widest ${activeTab === 'simulation' ? 'border-neutral-900 text-neutral-900' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
             >
               Simulation Engine
             </button>
@@ -149,6 +177,7 @@ export default function Dashboard({
                         <Tooltip 
                           cursor={{fill: '#F3F4F6'}}
                           contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}}
+                          formatter={(value, name, props) => [props.payload.realValue, name]}
                         />
                         <Bar dataKey="value" radius={[12, 12, 0, 0]} maxBarSize={60}>
                           {chartData.map((entry, index) => (
@@ -190,83 +219,46 @@ export default function Dashboard({
           </div>
         </div>
 
-        {/* Gamified Missions Section */}
-        <div className="glass-card p-5 sm:p-8 flex flex-col bg-gradient-to-br from-white to-blue-50/30">
-          <div className="flex justify-between items-center mb-4 sm:mb-6 flex-wrap gap-2 text-center">
+        {/* Sustainability Nexus Section */}
+        <div className="glass-card p-5 sm:p-8 flex flex-col bg-gradient-to-br from-white to-eco-50/30">
+          <div className="flex justify-between items-center mb-4 sm:mb-6">
             <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
-              <Target size={20} className="text-blue-500" /> Active Bounties
+              <Compass size={20} className="text-eco-500" /> Character Nexus
             </h3>
-            <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 transition-all">
-              <Trophy size={12}/> Lvl {level} ({xp} XP)
+            <span className="bg-eco-100 text-eco-700 text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest">
+              Archetype Analysis
             </span>
           </div>
           
-          <div className="space-y-4 flex-1">
-            {loadingBounties ? (
-              <div className="h-full flex items-center justify-center py-10 opacity-50">
-                <Loader2 size={32} className="animate-spin text-blue-500" />
-              </div>
-            ) : bounties.slice(0, 3).map(bounty => (
-              <div 
-                key={bounty.id} 
-                className={`bg-white border rounded-xl p-4 shadow-sm transition-colors relative overflow-hidden group 
-                  ${bounty.status === 'pending' ? 'border-blue-200' : 
-                    bounty.status === 'completed' ? 'border-green-200 bg-green-50/30' : 
-                    'border-neutral-100'}`}
-              >
-                {bounty.status === 'pending' && <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-full transition-transform group-hover:scale-110" />}
-                
-                <div className="flex justify-between items-start mb-2 relative z-10">
-                  <div>
-                    <h4 className={`font-bold text-sm ${bounty.status === 'pending' ? 'text-blue-700' : bounty.status === 'completed' ? 'text-green-700' : 'text-neutral-800'}`}>
-                      {bounty.title}
-                    </h4>
-                    <p className={`text-[10px] mt-0.5 font-medium flex items-center gap-1 ${bounty.status === 'completed' ? 'text-green-500' : 'text-neutral-400'}`}>
-                      {bounty.status === 'completed' ? <CheckCircle2 size={10}/> : <Clock size={10}/>} 
-                      {bounty.status === 'completed' ? 'Mission Accomplished' : bounty.deadline}
-                    </p>
-                  </div>
-                  {bounty.status === 'pending' ? (
-                    <button 
-                      onClick={() => onBountyClick(bounty.id)}
-                      className="bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md hover:bg-blue-600 transition-colors"
-                    >
-                      Accept
-                    </button>
-                  ) : bounty.status === 'completed' ? (
-                    <motion.span initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded inline-block">+{bounty.points} XP</motion.span>
-                  ) : (
-                    <span className="bg-neutral-100 text-neutral-500 text-[10px] font-bold px-2 py-1 rounded">{bounty.points} Pt</span>
-                  )}
-                </div>
+          <div className="flex-1 relative min-h-[300px] mb-4">
+             {/* Small Radar Preview */}
+             <ResponsiveContainer width="100%" height="100%">
+               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={[
+                 { subject: 'Mobility', A: userData?.travel === 'car' ? 95 : 30 },
+                 { subject: 'Energy', A: Math.min(100, ((userData?.electricity || 0) + (userData?.ac || 0)) * 2) },
+                 { subject: 'Diet', A: userData?.food === 'non-veg' ? 90 : 20 },
+                 { subject: 'Shop', A: (userData?.shopping || 0) * 10 },
+                 { subject: 'Waste', A: Math.min(100, (prediction?.waste_generation || 0) * 6) },
+               ]}>
+                 <PolarGrid stroke="#e5e7eb" />
+                 <PolarAngleAxis dataKey="subject" tick={{ fill: '#9ca3af', fontSize: 10, fontWeight: 700 }} />
+                 <Radar name="Impact" dataKey="A" stroke="#10b981" fill="#10b981" fillOpacity={0.6} />
+               </RadarChart>
+             </ResponsiveContainer>
+          </div>
 
-                {bounty.status === 'active' && (
-                  <div className="mt-4 space-y-3 relative z-10">
-                    <div className="w-full bg-neutral-100 rounded-full h-1 mt-3 relative overflow-hidden">
-                      <motion.div 
-                        className="bg-blue-500 h-full rounded-full" 
-                        initial={{ width: `${bounty.progress - 20}%` }}
-                        animate={{ width: `${bounty.progress}%` }}
-                        transition={{ type: "spring", stiffness: 100 }}
-                      />
-                    </div>
-                    <button 
-                      onClick={() => onBountyClick(bounty.id)}
-                      className="w-full py-2 bg-neutral-900 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-neutral-800 transition-all flex items-center justify-center gap-1.5"
-                    >
-                      <Sparkles size={12} className="text-eco-400" /> Claim Progress
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
+          <div className="p-4 bg-white border border-eco-100 rounded-2xl mb-4">
+            <p className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">Estimated Archetype</p>
+            <p className="text-sm font-black text-neutral-900 leading-tight">
+              {prediction.sustainability_score > 70 ? 'The Eco-Guardian' : 'The Urban Consumer'}
+            </p>
           </div>
 
           <button 
-            onClick={onViewBounties}
-            className="w-full mt-6 flex items-center justify-center gap-2 py-3 bg-neutral-50 text-neutral-600 text-[11px] font-bold uppercase tracking-widest rounded-xl border border-neutral-100 hover:bg-neutral-100 transition-all group"
+            onClick={onViewNexus}
+            className="w-full mt-auto flex items-center justify-center gap-2 py-3 bg-neutral-900 text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:bg-neutral-800 transition-all group shadow-lg shadow-neutral-200"
           >
-            Quest Board <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            Enter Nexus <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </div>

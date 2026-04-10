@@ -23,7 +23,12 @@ export default function Settings() {
       
       const { username } = JSON.parse(storedUser);
       try {
-        const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-settings?username=${username}`);
+        const token = JSON.parse(storedUser).token;
+        const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-settings?username=${username}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (resp.ok) {
           const settings = await resp.json();
           if (settings.language) setLanguage(settings.language);
@@ -42,9 +47,13 @@ export default function Settings() {
     
     const { username } = JSON.parse(storedUser);
     try {
+      const token = JSON.parse(storedUser).token;
       const resp = await fetch(`${import.meta.env.VITE_API_URL}/update-settings`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           username,
           settings: { 

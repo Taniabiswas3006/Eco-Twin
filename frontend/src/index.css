@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;700;900&display=swap');
 
 @import "tailwindcss";
 
@@ -50,6 +50,7 @@ body {
   --color-ring: var(--color-eco-500);
 
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
 
   --shadow-apple: 0 4px 24px rgba(0,0,0,0.06);
 }
