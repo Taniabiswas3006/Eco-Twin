@@ -8,6 +8,7 @@ import Sidebar from './Sidebar';
 import Profile from './Profile';
 import SustainabilityNexus from './SustainabilityNexus';
 import EcoActionHub from './EcoActionHub';
+import API_URL from '../apiConfig';
 
 
 export default function DigitalTwin() {
@@ -58,7 +59,7 @@ export default function DigitalTwin() {
     setUserData(data);
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/predict`, {
+      const response = await fetch(`${API_URL}/predict`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data),

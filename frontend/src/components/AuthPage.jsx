@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from 'react-router-dom';
 import { Leaf, Loader2, ArrowLeft, ShieldCheck, User, Phone, Info, Eye, EyeOff, Sparkles } from "lucide-react";
 
+import API_URL from '../apiConfig';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -252,9 +253,8 @@ export default function AuthPage({ mode = 'login' }) {
   const [loadingMessage, setLoadingMessage] = useState('');
 
   React.useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL;
-    if (apiUrl && !apiUrl.includes('localhost')) {
-      fetch(`${apiUrl}/`, { method: 'HEAD' }).catch(() => {});
+    if (API_URL && !API_URL.includes('localhost')) {
+      fetch(`${API_URL}/`, { method: 'HEAD' }).catch(() => {});
     }
   }, []);
 
@@ -262,7 +262,7 @@ export default function AuthPage({ mode = 'login' }) {
     setIsLoading(true);
     setError('');
     setLoadingMessage('Authenticating...');
-    const url = isLogin ? `${import.meta.env.VITE_API_URL}/login` : `${import.meta.env.VITE_API_URL}/signup`;
+    const url = isLogin ? `${API_URL}/login` : `${API_URL}/signup`;
     const slowTimer = setTimeout(() => setLoadingMessage('Server is waking up, please wait...'), 5000);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
