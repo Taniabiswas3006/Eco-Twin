@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, Leaf, Wind, MapPin, Zap, Flame, Snowflake, ShoppingBag, Utensils, Droplets, Wallet } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 export default function SimulationEngine({ userData, currentScore }) {
   const [simulatedData, setSimulatedData] = useState(userData ? { ...userData } : {});
@@ -13,7 +14,7 @@ export default function SimulationEngine({ userData, currentScore }) {
   const runSimulation = async () => {
     setIsSimulating(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/simulate`, {
+      const response = await fetch(`${API_URL}/simulate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

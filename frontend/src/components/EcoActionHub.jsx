@@ -5,6 +5,7 @@ import {
   ArrowRight, Info, PlusCircle, Trash2, 
   Leaf, Zap, Scale, Compass, Loader2
 } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 export default function EcoActionHub() {
   const [activeTab, setActiveTab] = useState('offset');
@@ -37,7 +38,7 @@ export default function EcoActionHub() {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/action-calculate`, {
+      const response = await fetch(`${API_URL}/action-calculate`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

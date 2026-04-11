@@ -3,6 +3,7 @@ import {
    User, Mail, Phone, Shield, Camera,
    Leaf, Zap, Car, ArrowRight, ExternalLink
 } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 // Local LogOut icon
 function LogOutIcon({ size = 16, className }) {
@@ -39,7 +40,7 @@ export default function Profile({ user: initialUser }) {
             const storedUser = localStorage.getItem('user');
             const token = storedUser ? JSON.parse(storedUser).token : null;
             
-            const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-profile?username=${mainUser.username}`, {
+            const resp = await fetch(`${API_URL}/get-profile?username=${mainUser.username}`, {
                headers: {
                   'Authorization': `Bearer ${token}`
                }
