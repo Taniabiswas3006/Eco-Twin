@@ -39,7 +39,7 @@ export default function Profile({ user: initialUser }) {
          try {
             const storedUser = localStorage.getItem('user');
             const token = storedUser ? JSON.parse(storedUser).token : null;
-            
+
             const resp = await fetch(`${API_URL}/get-profile?username=${mainUser.username}`, {
                headers: {
                   'Authorization': `Bearer ${token}`
@@ -88,7 +88,7 @@ export default function Profile({ user: initialUser }) {
 
                <div className="relative z-10 p-6 sm:p-12">
                   <div className="flex flex-col md:flex-row gap-10 items-center md:items-start text-center md:text-left">
-                     
+
                      {/* Avatar */}
                      <div className="relative shrink-0">
                         <div className="w-32 h-32 rounded-[2.5rem] bg-white border border-neutral-100 p-2 shadow-2xl shadow-neutral-200">
@@ -107,21 +107,19 @@ export default function Profile({ user: initialUser }) {
                               <h1 className="text-3xl font-black text-neutral-900 tracking-tighter">{user?.username || 'Eco Enthusiast'}</h1>
                               <div className="flex gap-2 justify-center md:justify-start">
                                  <span className="px-3 py-1 bg-eco-50 text-eco-600 text-[9px] font-black rounded-lg border border-eco-100 uppercase tracking-widest">{stats.tier} TIER</span>
-                                 <span className="px-3 py-1 bg-neutral-900 text-white text-[9px] font-black rounded-lg border border-neutral-800 uppercase tracking-widest flex items-center gap-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-eco-400 animate-pulse" /> Live Node
-                                 </span>
+                              
                               </div>
                            </div>
                            <p className="text-neutral-400 text-xs sm:text-sm font-medium tracking-wide">
-                             Environmental Twin Registry • {lastCheck ? `Last Check: ${formatDate(lastCheck.timestamp)}` : 'Awaiting First Check'}
+                              {lastCheck ? `Last Check: ${formatDate(lastCheck.timestamp)}` : 'Awaiting First Check'}
                            </p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-8 pt-10 border-t border-neutral-100 max-w-sm mx-auto sm:max-w-none">
-                           <IdentityField icon={<User size={16}/>} label="Full Identity" value={user?.name || "Anonymous Enthusiast"} />
-                           <IdentityField icon={<Mail size={16}/>} label="Cryptic Link" value={user?.email || "Locked Connection"} />
-                           <IdentityField icon={<Phone size={16}/>} label="Device Link" value={user?.phone || "Not Synced"} />
-                           <IdentityField icon={<Shield size={16}/>} label="Protection" value="Standard Encryption" />
+                           <IdentityField icon={<User size={16} />} label="Full Identity" value={user?.name || "Anonymous Enthusiast"} />
+                           <IdentityField icon={<Mail size={16} />} label="Cryptic Link" value={user?.email || "Locked Connection"} />
+                           <IdentityField icon={<Phone size={16} />} label="Device Link" value={user?.phone || "Not Synced"} />
+                           <IdentityField icon={<Shield size={16} />} label="Protection" value="Standard Encryption" />
                         </div>
                      </div>
                   </div>
@@ -137,32 +135,32 @@ export default function Profile({ user: initialUser }) {
                         <p className="text-sm font-black text-neutral-900 tracking-tight leading-none">Sustainability Performance Archive</p>
                      </div>
                      <button className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.15em] flex items-center gap-1 hover:text-neutral-900 transition-colors">
-                        Full History <ExternalLink size={10} />
+
                      </button>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                     <MiniStat 
-                        label="CO₂ FOOTPRINT" 
-                        value={lastCheck?.total ? `${lastCheck.total} kg` : '-- kg'} 
-                        color="text-eco-600" 
+                     <MiniStat
+                        label="CO₂ FOOTPRINT"
+                        value={lastCheck?.total ? `${lastCheck.total} kg` : '-- kg'}
+                        color="text-eco-600"
                      />
-                     <MiniStat 
-                        label="SUSTAINABILITY" 
-                        value={lastCheck?.sustainability_score !== undefined ? `${lastCheck.sustainability_score}` : '--'} 
-                        color="text-emerald-500" 
+                     <MiniStat
+                        label="SUSTAINABILITY"
+                        value={lastCheck?.sustainability_score !== undefined ? `${lastCheck.sustainability_score}` : '--'}
+                        color="text-emerald-500"
                      />
-                     <MiniStat 
-                        label="LOCAL IMPACT" 
-                        value={lastCheck?.sustainability_score !== undefined ? (lastCheck.sustainability_score > 60 ? 'POSITIVE' : 'BALANCED') : 'SYNCING'} 
-                        color="text-blue-500" 
+                     <MiniStat
+                        label="LOCAL IMPACT"
+                        value={lastCheck?.sustainability_score !== undefined ? (lastCheck.sustainability_score > 60 ? 'POSITIVE' : 'BALANCED') : 'SYNCING'}
+                        color="text-blue-500"
                      />
                      <MiniStat label="STATUS" value={stats.status} color="text-orange-500" />
                   </div>
 
                </div>
-               
-               <div 
+
+               <div
                   className="bg-neutral-50 p-6 flex items-center justify-between border-t border-neutral-100 group cursor-pointer hover:bg-red-50 transition-colors"
                   onClick={() => {
                      localStorage.removeItem('user');
