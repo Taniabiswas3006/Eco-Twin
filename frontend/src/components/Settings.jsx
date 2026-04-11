@@ -5,6 +5,7 @@ import {
   ArrowRight, Check, Database, Mail, 
   CreditCard, Key, Cloud, Eye, HelpCircle, LogOut 
 } from 'lucide-react';
+import API_URL from '../apiConfig';
 
 export default function Settings() {
   const [language, setLanguage] = useState('English');
@@ -24,7 +25,7 @@ export default function Settings() {
       const { username } = JSON.parse(storedUser);
       try {
         const token = JSON.parse(storedUser).token;
-        const resp = await fetch(`${import.meta.env.VITE_API_URL}/get-settings?username=${username}`, {
+        const resp = await fetch(`${API_URL}/get-settings?username=${username}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -48,7 +49,7 @@ export default function Settings() {
     const { username } = JSON.parse(storedUser);
     try {
       const token = JSON.parse(storedUser).token;
-      const resp = await fetch(`${import.meta.env.VITE_API_URL}/update-settings`, {
+      const resp = await fetch(`${API_URL}/update-settings`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
