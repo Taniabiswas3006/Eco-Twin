@@ -114,7 +114,7 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
               <div className="py-6">
                 <div className="flex justify-between mb-4">
                   <span className="text-neutral-500 font-medium">Lights, fans, devices</span>
-                  <span className="font-bold text-eco-600 text-xl">{formData.electricity} hours/day</span>
+                  <span className="font-bold text-eco-600 text-xl">{formData.electricity} {formData.electricity === 1 ? 'hour' : 'hours'}/day</span>
                 </div>
                 <input
                   type="range"
@@ -136,7 +136,7 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
               <div className="py-6">
                 <div className="flex justify-between mb-4">
                   <span className="text-neutral-500 font-medium">AC, heater, washing machine</span>
-                  <span className="font-bold text-eco-600 text-xl">{formData.ac} hours/day</span>
+                  <span className="font-bold text-eco-600 text-xl">{formData.ac} {formData.ac === 1 ? 'hour' : 'hours'}/day</span>
                 </div>
                 <input
                   type="range"
@@ -165,7 +165,7 @@ export default function InputForm({ onComplete, isLoading, hasPrevious, onLoadPr
               <div className="py-6">
                 <div className="flex justify-between mb-4">
                   <span className="text-neutral-500 font-medium">Frequency</span>
-                  <span className="font-bold text-eco-600 text-xl">{formData.shopping} times/week</span>
+                  <span className="font-bold text-eco-600 text-xl">{formData.shopping} {formData.shopping === 1 ? 'time' : 'times'}/week</span>
                 </div>
                 <input
                   type="range"

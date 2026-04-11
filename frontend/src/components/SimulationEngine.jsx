@@ -131,17 +131,17 @@ export default function SimulationEngine({ userData, currentScore }) {
 
           <div className="space-y-6">
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Zap size={14} /> Electricity Use</span> <span className="text-eco-600">{simulatedData.electricity} hrs</span></div>
+              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Zap size={14} /> Electricity Use</span> <span className="text-eco-600">{simulatedData.electricity} {simulatedData.electricity === 1 ? 'hr' : 'hrs'}</span></div>
               <input type="range" min="0" max="24" value={simulatedData.electricity} onChange={(e) => setSimulatedData({ ...simulatedData, electricity: Number(e.target.value) })} />
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Snowflake size={14} /> AC Usage</span> <span className="text-eco-600">{simulatedData.ac} hrs</span></div>
+              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><Snowflake size={14} /> AC Usage</span> <span className="text-eco-600">{simulatedData.ac} {simulatedData.ac === 1 ? 'hr' : 'hrs'}</span></div>
               <input type="range" min="0" max="24" value={simulatedData.ac} onChange={(e) => setSimulatedData({ ...simulatedData, ac: Number(e.target.value) })} />
             </div>
 
             <div>
-              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><ShoppingBag size={14} /> Shopping</span> <span className="text-eco-600">{simulatedData.shopping}x/wk</span></div>
+              <div className="flex justify-between text-xs font-semibold mb-2 text-neutral-600"><span className="flex items-center gap-1"><ShoppingBag size={14} /> Shopping</span> <span className="text-eco-600">{simulatedData.shopping} {simulatedData.shopping === 1 ? 'time' : 'times'}/wk</span></div>
               <input type="range" min="0" max="10" value={simulatedData.shopping} onChange={(e) => setSimulatedData({ ...simulatedData, shopping: Number(e.target.value) })} />
             </div>
           </div>

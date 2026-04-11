@@ -165,7 +165,7 @@ export default function HowItWorks() {
                 <div className="relative rounded-[1.5rem] overflow-hidden aspect-video shadow-inner bg-neutral-100">
                   <iframe
                     className="w-full h-full"
-                    src="https://www.youtube.com/embed/Sc6a5t6zR20"
+                    src="https://www.youtube.com/embed/nBTi_a9zw2o"
                     title="EcoTwin Product Demo"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -137,14 +137,14 @@ export default function EcoActionHub() {
                         </div>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => handleCalculate('offset')}
-                      disabled={loading}
-                      className="w-full py-4 bg-neutral-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-black transition-all"
-                    >
-                      {loading ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />} 
-                      Analyze Reforestation Strategy
-                    </button>
+                      <button 
+                        onClick={() => handleCalculate('offset')}
+                        disabled={loading}
+                        className="w-full py-3 px-4 bg-neutral-900 text-white rounded-2xl font-extrabold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 hover:bg-black transition-all text-center leading-snug"
+                      >
+                        {loading ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />} 
+                        Analyze Reforestation Strategy
+                      </button>
                   </div>
 
                   {result && activeTab === 'offset' && (
@@ -211,7 +211,7 @@ export default function EcoActionHub() {
                     <button 
                       onClick={() => handleCalculate('meal')}
                       disabled={loading}
-                      className="w-full py-4 bg-neutral-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-black transition-all mt-4"
+                      className="w-full py-3 px-4 bg-neutral-900 text-white rounded-2xl font-extrabold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 hover:bg-black transition-all mt-4 text-center leading-snug"
                     >
                       {loading ? <Loader2 className="animate-spin" size={16} /> : <Zap size={16} />} 
                       Audit Culinary Footprint
@@ -278,7 +278,7 @@ export default function EcoActionHub() {
                     <button 
                       onClick={() => handleCalculate('purchase')}
                       disabled={loading}
-                      className="w-full py-4 bg-neutral-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-black transition-all mt-4"
+                      className="w-full py-3 px-4 bg-neutral-900 text-white rounded-2xl font-extrabold uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 hover:bg-black transition-all mt-4 text-center leading-snug"
                     >
                       {loading ? <Loader2 className="animate-spin" size={16} /> : <ShoppingBag size={16} />} 
                       Run Material Audit

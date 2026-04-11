@@ -213,7 +213,7 @@ export default function Dashboard({
                 <div className="bg-white p-2 rounded-lg shadow-sm flex-shrink-0">
                   <ArrowUpRight size={18} className="text-neutral-600" />
                 </div>
-                <p className="text-neutral-800 leading-relaxed text-sm sm:text-base font-bold">{insight}</p>
+                <p className="text-neutral-800 leading-relaxed text-sm sm:text-base font-bold line-clamp-3">{insight}</p>
               </div>
             ))}
           </div>

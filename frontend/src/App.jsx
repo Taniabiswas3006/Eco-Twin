@@ -6,6 +6,14 @@ import DigitalTwin from './components/DigitalTwin';
 import BlogPage from './components/BlogPage';
 import HowItWorks from './components/HowItWorks';
 
+import { Navigate } from 'react-router-dom';
+
+function ProtectedRoute({ children }) {
+  const user = localStorage.getItem('user');
+  if (!user) return <Navigate to="/login" replace />;
+  return children;
+}
+
 function App() {
   return (
     <div className="flex flex-col relative min-h-screen">
@@ -22,7 +30,11 @@ function App() {
           <Route path="/*" element={
             <div className="w-full max-w-5xl mx-auto flex-1 flex flex-col justify-center p-6 relative">
               <Routes>
-                <Route path="/app" element={<DigitalTwin />} />
+                <Route path="/app" element={
+                  <ProtectedRoute>
+                    <DigitalTwin />
+                  </ProtectedRoute>
+                } />
               </Routes>
             </div>
           } />

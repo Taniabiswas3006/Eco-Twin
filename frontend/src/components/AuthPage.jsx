@@ -174,7 +174,6 @@ export default function AuthPage({ mode = 'login' }) {
       username: "",
       email: "",
       password: "",
-      rememberMe: false,
     } : {
       name: "",
       username: "",
@@ -366,7 +365,7 @@ export default function AuthPage({ mode = 'login' }) {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400">Full Name</FormLabel>
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2 block">Full Name</FormLabel>
                             <FormControl>
                               <Input placeholder="Jane Doe" {...field} disabled={isLoading} onFocus={() => setIsTyping(true)} onBlur={() => setIsTyping(false)} className="rounded-xl h-11 bg-neutral-50/50 border-neutral-100" />
                             </FormControl>
@@ -381,7 +380,7 @@ export default function AuthPage({ mode = 'login' }) {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400">Phone Number</FormLabel>
+                            <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2 block">Phone Number</FormLabel>
                             <FormControl>
                               <Input placeholder="10-digit number" {...field} disabled={isLoading} onFocus={() => setIsTyping(true)} onBlur={() => setIsTyping(false)} className="rounded-xl h-11 bg-neutral-50/50 border-neutral-100" />
                             </FormControl>
@@ -399,7 +398,7 @@ export default function AuthPage({ mode = 'login' }) {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400">Email Address</FormLabel>
+                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2 block">Email Address</FormLabel>
                         <FormControl>
                           <Input type="email" placeholder="jane@example.com" {...field} disabled={isLoading} onFocus={() => setIsTyping(true)} onBlur={() => setIsTyping(false)} className="rounded-xl h-11 bg-neutral-50/50 border-neutral-100" />
                         </FormControl>
@@ -415,7 +414,7 @@ export default function AuthPage({ mode = 'login' }) {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400">Username</FormLabel>
+                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2 block">Username</FormLabel>
                         <FormControl>
                           <Input placeholder="eco_warrior" {...field} disabled={isLoading} onFocus={() => setIsTyping(true)} onBlur={() => setIsTyping(false)} className="rounded-xl h-11 bg-neutral-50/50 border-neutral-100" />
                         </FormControl>
@@ -432,7 +431,7 @@ export default function AuthPage({ mode = 'login' }) {
                       name="gender"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400">Gender</FormLabel>
+                          <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2 block">Gender</FormLabel>
                           <select
                             {...field}
                             onFocus={() => setIsTyping(true)}
@@ -459,7 +458,7 @@ export default function AuthPage({ mode = 'login' }) {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400">Password</FormLabel>
+                        <FormLabel className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2 block">Password</FormLabel>
                         <div className="relative">
                           <FormControl>
                             <Input 
@@ -487,29 +486,16 @@ export default function AuthPage({ mode = 'login' }) {
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="flex items-center justify-between">
-                  {isLogin ? (
-                    <FormField
-                      control={form.control}
-                      name="rememberMe"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-2 space-y-0">
-                          <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isLoading} className="data-[state=checked]:bg-eco-600 border-eco-200 h-4 w-4 mt-0.5" />
-                          </FormControl>
-                          <FormLabel className="text-xs font-medium text-neutral-500 cursor-pointer">Keep me synced</FormLabel>
-                        </FormItem>
-                      )}
-                    />
-                  ) : (
+                  {!isLogin && (
                     <FormField
                       control={form.control}
                       name="agreeTerms"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-2 space-y-0">
+                        <FormItem className="flex flex-row items-center space-x-2 space-y-0">
                           <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isLoading} className="data-[state=checked]:bg-eco-600 border-eco-200 h-4 w-4 mt-0.5" />
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled={isLoading} className="data-[state=checked]:bg-eco-600 border-eco-200 h-4 w-4" />
                           </FormControl>
-                          <FormLabel className="text-[10px] font-medium text-neutral-400 leading-normal">
+                          <FormLabel className="text-[10px] font-medium text-neutral-400 leading-none cursor-pointer">
                             I agree to the <span className="text-eco-600 underline">Terms</span> and Environmental Policy.
                           </FormLabel>
                         </FormItem>

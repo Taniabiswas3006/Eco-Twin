@@ -115,7 +115,9 @@ def init_db():
                 settings TEXT DEFAULT '{}',
                 bounties TEXT DEFAULT '[]',
                 xp INTEGER DEFAULT 0,
-                level INTEGER DEFAULT 1
+                level INTEGER DEFAULT 1,
+                userData TEXT DEFAULT '{}',
+                lastPrediction TEXT DEFAULT '{}'
             )''')
             # Handle existing table migrations
             try:
@@ -124,6 +126,8 @@ def init_db():
                 c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS bounties TEXT DEFAULT '[]'")
                 c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS xp INTEGER DEFAULT 0")
                 c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS level INTEGER DEFAULT 1")
+                c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS userData TEXT DEFAULT '{}'")
+                c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS lastPrediction TEXT DEFAULT '{}'")
             except: pass
         else:
             # SQLite schema
@@ -138,7 +142,9 @@ def init_db():
                 settings TEXT DEFAULT '{}',
                 bounties TEXT DEFAULT '[]',
                 xp INTEGER DEFAULT 0,
-                level INTEGER DEFAULT 1
+                level INTEGER DEFAULT 1,
+                userData TEXT DEFAULT '{}',
+                lastPrediction TEXT DEFAULT '{}'
             )''')
             # SQLite column check
             try:
@@ -152,6 +158,12 @@ def init_db():
             except: pass
             try:
                 c.execute("ALTER TABLE users ADD COLUMN level INTEGER DEFAULT 1")
+            except: pass
+            try:
+                c.execute("ALTER TABLE users ADD COLUMN userData TEXT DEFAULT '{}'")
+            except: pass
+            try:
+                c.execute("ALTER TABLE users ADD COLUMN lastPrediction TEXT DEFAULT '{}'")
             except: pass
         
         conn.commit()
@@ -168,7 +180,8 @@ def index():
     return jsonify({"status": "active", "message": "EcoTwin Backend is running perfectly!"}), 200
 
 @app.route('/predict', methods=['POST'])
-def predict():
+@token_required
+def predict(current_user):
     data = request.json
     if not data:
         return jsonify({"error": "No input provided"}), 400
@@ -215,6 +228,7 @@ def predict():
         "Separate tips with the '|' symbol. No numbers."
     )
     
+    insights = []
     try:
         raw_ai_response = get_ai_insight(ai_prompt)
         insights = [s.strip() for s in raw_ai_response.split('|') if len(s.strip()) > 10][:4]
@@ -223,14 +237,47 @@ def predict():
     except Exception:
         insights = ["Check your carbon footprint details.", "Review energy usage.", "Monitor waste generation.", "Improve sustainable habits."]
     
-    return jsonify({
+    prediction_result = {
         "carbon_footprint": round(carbon_pred, 2),
         "energy_consumption": round(energy_pred, 2),
         "waste_generation": round(waste_pred, 2),
         "sustainability_score": round(total_score, 1),
         "category": category,
         "insights": insights
-    })
+    }
+
+    # Save to database for cross-device persistence
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
+        c.execute(f"UPDATE users SET userData={placeholder}, lastPrediction={placeholder} WHERE username={placeholder}", 
+                  (json.dumps(data), json.dumps(prediction_result), current_user))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"Failed to save persistence data: {e}")
+
+    return jsonify(prediction_result)
+
+@app.route('/get-latest-prediction', methods=['GET'])
+@token_required
+def get_latest_prediction(current_user):
+    try:
+        conn = get_db_connection()
+        c = conn.cursor()
+        placeholder = '?' if isinstance(conn, sqlite3.Connection) else '%s'
+        c.execute(f"SELECT userData, lastPrediction FROM users WHERE username={placeholder}", (current_user,))
+        row = c.fetchone()
+        conn.close()
+        if row and row[0] and row[1] and row[0] != '{}':
+            return jsonify({
+                "userData": json.loads(row[0]),
+                "prediction": json.loads(row[1])
+            }), 200
+        return jsonify({"message": "No previous data found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/simulate', methods=['POST'])
 def simulate():
@@ -360,7 +407,7 @@ def signup():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
-    username, password, email = data['username'], data['password'], data['email']
+    username, password, email = data.get('username'), data.get('password'), data.get('email')
     try:
         conn = get_db_connection()
         c = conn.cursor()

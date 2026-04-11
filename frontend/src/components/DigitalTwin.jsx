@@ -19,6 +19,7 @@ export default function DigitalTwin() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [user, setUser] = useState(null);
   const [hasPrevious, setHasPrevious] = useState(false);
+  const [isLimitedMode, setIsLimitedMode] = useState(false);
   const bountyClickTimeout = useRef(null);
 
   const getAuthHeaders = () => {
@@ -36,9 +37,37 @@ export default function DigitalTwin() {
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
-      if (localStorage.getItem(`eco_twin_prev_${parsedUser.username}`)) {
-        setHasPrevious(true);
-      }
+      
+      // Fetch latest from backend if available for cross-device sync
+      const fetchLatest = async () => {
+        try {
+          const resp = await fetch(`${API_URL}/get-latest-prediction`, {
+            headers: {
+              'Authorization': `Bearer ${parsedUser.token}`
+            }
+          });
+          if (resp.ok) {
+            const result = await resp.json();
+            setUserData(result.userData);
+            setPrediction(result.prediction);
+            setHasPrevious(true);
+            // Sync to local for performance
+            localStorage.setItem(`eco_twin_prev_${parsedUser.username}`, JSON.stringify({ 
+              data: result.userData, 
+              prediction: result.prediction 
+            }));
+          } else if (localStorage.getItem(`eco_twin_prev_${parsedUser.username}`)) {
+            setHasPrevious(true);
+          }
+        } catch (err) {
+          console.error("Sync error:", err);
+          if (localStorage.getItem(`eco_twin_prev_${parsedUser.username}`)) {
+            setHasPrevious(true);
+          }
+        }
+      };
+      
+      fetchLatest();
     }
   }, []);
 
@@ -54,6 +83,11 @@ export default function DigitalTwin() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   const handleCalculate = async (data) => {
     setIsLoading(true);
     setUserData(data);
@@ -65,6 +99,11 @@ export default function DigitalTwin() {
         body: JSON.stringify(data),
       });
       
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
+
       const result = await response.json();
       
       if (!result || typeof result !== 'object') {
@@ -95,6 +134,7 @@ export default function DigitalTwin() {
       }
       
       setPrediction(safeResult);
+      setIsLimitedMode(false);
       if (user && user.username) {
         // Save for profile persistence
         const checkData = {
@@ -110,13 +150,19 @@ export default function DigitalTwin() {
       }
     } catch (error) {
       console.error("Error predicting:", error);
+      setIsLimitedMode(true);
       setPrediction({
         carbon_footprint: 320.5,
         energy_consumption: 140.2,
         waste_generation: 6.5,
         sustainability_score: 72.4,
         category: 'Eco-conscious',
-        insights: ["You consume more energy than efficient users. Consider reducing AC usage."]
+        insights: [
+          "Twin is currently offline. Showing estimated profile based on global averages.",
+          "Consider reducing general electricity usage by switching off unused devices.",
+          "Walking or cycling for short distances can significantly lower your carbon impact.",
+          "Minimizing food waste is one of the most effective ways to lower your footprint."
+        ]
       });
     } finally {
       setIsLoading(false);
@@ -127,11 +173,6 @@ export default function DigitalTwin() {
     setUserData(null);
     setPrediction(null);
     setActiveTab('dashboard');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/');
   };
 
   const showSidebar = !!prediction || activeTab === 'profile' || activeTab === 'nexus' || activeTab === 'hub';
@@ -170,8 +211,15 @@ export default function DigitalTwin() {
         user={user}
       />
 
+      {/* Limited Mode Banner */}
+      {isLimitedMode && (
+        <div className="md:ml-64 bg-amber-500 text-white py-2 px-4 text-center text-xs font-bold uppercase tracking-widest fixed top-0 left-0 right-0 z-[300]">
+          Limited Mode: Showing Estimated Results due to server connection issues
+        </div>
+      )}
+
       {/* Main Content Area */}
-      <main className="flex-1 ml-0 md:ml-64 p-4 pt-16 sm:p-6 sm:pt-16 md:p-8 lg:p-12 md:pt-12 transition-all duration-300 overflow-y-auto">
+      <main className={`flex-1 ml-0 md:ml-64 p-4 ${isLimitedMode ? 'pt-24' : 'pt-16'} sm:p-6 sm:${isLimitedMode ? 'pt-24' : 'pt-16'} md:p-8 lg:p-12 md:pt-12 transition-all duration-300 overflow-y-auto`}>
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' ? (
             <motion.div
