@@ -68,15 +68,18 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout, user }) {
       </nav>
 
       <div className="p-3 md:p-4 border-t border-neutral-50">
-        <div className="bg-neutral-50 rounded-2xl p-3.5 md:p-4 mb-3 md:mb-4 flex items-center gap-3">
-          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-500 font-bold border-2 border-white shadow-sm overflow-hidden text-sm flex-shrink-0">
+        <button 
+          onClick={() => setActiveTab('profile')}
+          className="w-full bg-neutral-50 hover:bg-neutral-100 transition-all rounded-2xl p-3.5 md:p-4 mb-3 md:mb-4 flex items-center gap-3 text-left group/profile border border-transparent hover:border-neutral-200"
+        >
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-neutral-200 flex items-center justify-center text-neutral-500 font-bold border-2 border-white shadow-sm overflow-hidden text-sm flex-shrink-0 group-hover/profile:scale-105 transition-transform">
             {user?.username?.charAt(0).toUpperCase() || <User size={18} />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-neutral-900 truncate">{user?.username || 'Guest User'}</p>
+            <p className="text-sm font-semibold text-neutral-900 truncate group-hover/profile:text-eco-600 transition-colors">{user?.username || 'Guest User'}</p>
             <p className="text-[11px] text-neutral-500 font-medium">Standard Member</p>
           </div>
-        </div>
+        </button>
         
         <button 
           onClick={onLogout}
